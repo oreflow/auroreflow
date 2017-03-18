@@ -9,6 +9,6 @@ public class AuroreflowServletModule extends ServletModule{
     serve("/lightbulb/update/*").with(UpdateLightbulbServlet.class);
     serve("/lightbulb/get/*").with(GetLightbulbServlet.class);
     serve("/lightbulb/list").with(ListLightbulbServlet.class);
-    serve("/poweroff").with(PowerOffServlet.class);
+    serve("/poweroff").with(PowerOffAllServlet.class);
   }
 }

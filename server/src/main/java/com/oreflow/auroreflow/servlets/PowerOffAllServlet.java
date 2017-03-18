@@ -15,18 +15,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Singleton
-public class PowerOffServlet extends HttpServlet {
+public class PowerOffAllServlet extends HttpServlet {
   private final LightbulbService lightbulbService;
 
   @Inject
-  public PowerOffServlet(LightbulbService lightbulbService) {
+  public PowerOffAllServlet(LightbulbService lightbulbService) {
     this.lightbulbService = lightbulbService;
 
   }
   @Override
   public void doPut(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-
     LightbulbRequest lightbulbRequest = LightbulbRequest.newBuilder()
         .setPowerRequest(
             PowerRequest.newBuilder()

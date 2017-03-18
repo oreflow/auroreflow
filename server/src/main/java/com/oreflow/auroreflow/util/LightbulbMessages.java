@@ -21,13 +21,16 @@ public final class LightbulbMessages {
         Verify.verify(lightbulbRequest.getHsvRequest().getSat() <= 100 , "Saturation has to be <= 100");
         Verify.verify(lightbulbRequest.getHsvRequest().getBrightness() >= 1 , "Brightness has to be >= 1");
         Verify.verify(lightbulbRequest.getHsvRequest().getBrightness() <= 100 , "Brightness has to be <= 100");
+        break;
       case CT_REQUEST:
         Verify.verify(lightbulbRequest.getCtRequest().getCt() >= 1700 , "CT has to be >= 1700");
         Verify.verify(lightbulbRequest.getCtRequest().getCt() <=  6500, "CT has to be <= 6500");
         Verify.verify(lightbulbRequest.getCtRequest().getBrightness() >= 1 , "Brightness has to be >= 1");
         Verify.verify(lightbulbRequest.getCtRequest().getBrightness() <= 100 , "Brightness has to be <= 100");
+        break;
       case POWER_REQUEST:
         Verify.verify(lightbulbRequest.getPowerRequest().getPowerValue() > 0, "Power has to be ON or OFF");
+        break;
       default:
     }
   }

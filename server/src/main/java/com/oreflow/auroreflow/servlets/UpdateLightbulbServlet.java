@@ -24,7 +24,7 @@ public class UpdateLightbulbServlet extends HttpServlet {
 
   @Override
   public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    long lightbulbId = Long.parseLong(req.getPathInfo());
+    long lightbulbId = Long.parseLong(req.getPathInfo().replace("/",""));
     LightbulbRequest lightbulbRequest = JsonUtil.parseLightbulbRequest(req.getReader());
     LightbulbMessages.validateLightbulbRequest(lightbulbRequest);
     System.out.printf("Got request with id %d, and message %s", lightbulbId, lightbulbRequest);

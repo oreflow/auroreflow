@@ -1,6 +1,5 @@
 package com.oreflow.auroreflow.servlets;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb;
@@ -12,8 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import static com.oreflow.auroreflow.util.JsonUtil.jsonArrayOf;
 
 @Singleton
 public class GetLightbulbServlet extends HttpServlet {
@@ -27,7 +24,7 @@ public class GetLightbulbServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    long lightbulbId = Long.parseLong(req.getPathInfo());
+    long lightbulbId = Long.parseLong(req.getPathInfo().replace("/", ""));
     Lightbulb lightbulb = lightbulbService.getLightbulb(lightbulbId);
     String jsonResponse = JsonUtil.toJSON(lightbulb);
     resp.setContentType("application/json");
