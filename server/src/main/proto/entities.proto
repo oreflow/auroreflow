@@ -1,0 +1,73 @@
+syntax = "proto3";
+package com.oreflow.auroreflow.proto;
+
+option java_package = "com.oreflow.auroreflow.proto";
+option java_outer_classname = "AuroreflowProto";
+
+enum Effect {
+    SUDDEN = 0;
+    SMOOTH = 1;
+}
+
+enum Power {
+    POWER_UNKNOWN = 0;
+    OFF = 1;
+    ON = 2;
+}
+
+message Lightbulb {
+    enum Model {
+        MODEL_UNKNOWN = 0;
+        COLOR = 1;
+        MONO = 2;
+    }
+
+    int64 id = 1;
+    Model model = 2;
+    string location = 3;
+    string ip = 4;
+    int32 port = 5;
+    // on: smart LED is turned on / off: smart LED is turned off
+    Power power = 6;
+    // Brightness percentage. Range 1 ~ 100
+    int32 bright = 7;
+    // Color temperature. Range 1700 ~ 6500(k)
+    int32 ct = 8;
+    //Hue. Range 0 ~ 359
+    int32 hue = 9;
+    // Saturation. Range 0 ~ 100
+    int32 sat = 10;
+    //name The name of the device set by “set_name” command
+    string name = 11;
+    // If the lightbulb responded to the last call
+    bool is_active = 12;
+}
+
+message HsvRequest {
+    int32 hue = 1;
+    int32 sat = 2;
+    int32 brightness = 3;
+}
+
+message CtRequest {
+    int32 ct = 1;
+    int32 brightness = 2;
+}
+
+message PowerRequest {
+    Power power = 1;
+}
+
+message LightbulbRequest {
+    oneof request_type {
+        HsvRequest hsv_request = 1;
+        CtRequest ct_request = 2;
+        PowerRequest power_request = 3;
+    }
+}
+
+message LightbulbCommandResponse {
+    int64 id = 1;
+    repeated string result = 2;
+    repeated string error = 3;
+}
