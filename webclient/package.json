@@ -18,6 +18,7 @@
     "node-sass": "^4.5.0",
     "rxjs": "^5.0.1",
     "sass-loader": "^6.0.3",
+    "to-string-loader": "^1.1.5",
     "zone.js": "^0.7.2"
   },
   "devDependencies": {
@@ -29,6 +30,7 @@
     "html-loader": "^0.4.5",
     "less": "^2.7.2",
     "less-loader": "^3.0.0",
+    "style-loader": "^0.14.1",
     "ts-loader": "^2.0.2",
     "webpack": "2.2.1",
     "webpack-dev-server": "^2.2.1"

@@ -4,7 +4,7 @@ import { LightbulbService } from '../../service/lightbulb.service';
 
 @Component({
   template: require('./singlebulb.component.html'),
-  styleUrls: ['./components/singlebulb/singlebulb.component.css'],
+  styles: [require('./singlebulb.component.scss')],
 })
 export class SinglebulbComponent implements OnInit{
     constructor(private lightbulbService: LightbulbService) {}

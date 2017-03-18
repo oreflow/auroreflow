@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
+
 import { Lightbulb } from '../model/lightbulb';
 
 @Injectable()
@@ -13,7 +14,6 @@ export class LightbulbService {
     constructor(private http: Http) {}
 
     getListofLightbulbs(): Observable<Lightbulb[]> {
-        console.log('should http and stuff');
         let observable =  this.http.get(this.LIST_LIGHTBULBS_PATH)
             .map(this.extractArrayData);
             observable.subscribe((data)=>{
