@@ -19,6 +19,7 @@ public final class JsonUtil {
   private static final JsonParser jsonParser = new JsonParser();
   private JsonUtil() {}
 
+
   /**
    * Creates a JsonArray from a given collection
    */
@@ -48,7 +49,7 @@ public final class JsonUtil {
   }
 
   /**
-   *
+   * Parses a Lighbulb command response from JSON to {@link LightbulbCommandResponse}
    */
   public static LightbulbCommandResponse parseCommandResponse(String responseMessage) throws IOException {
     InputStream messageStream = new ByteArrayInputStream(responseMessage.getBytes());
@@ -58,13 +59,19 @@ public final class JsonUtil {
   }
 
   /**
-   *
-   * @param message
+   * Parses a JSON LightbulbRequest to {@link LightbulbRequest}
    */
   public static LightbulbRequest parseLightbulbRequest(BufferedReader message) throws IOException {
     InputStream targetStream = new ByteArrayInputStream(CharStreams.toString(message).getBytes());
     LightbulbRequest.Builder builder = LightbulbRequest.newBuilder();
     protobufJsonFormatter.merge(targetStream, builder);
     return builder.build();
+  }
+
+  /**
+   * Formats a protobuf {@link Message} as a JSON String
+   */
+  public static String toJSON(Message message) {
+    return protobufJsonFormatter.printToString(message);
   }
 }

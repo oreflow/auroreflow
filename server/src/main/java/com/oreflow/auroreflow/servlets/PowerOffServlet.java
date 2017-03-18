@@ -24,7 +24,7 @@ public class PowerOffServlet extends HttpServlet {
 
   }
   @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp)
+  public void doPut(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
     LightbulbRequest lightbulbRequest = LightbulbRequest.newBuilder()
