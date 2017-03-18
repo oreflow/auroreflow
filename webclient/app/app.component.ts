@@ -9,6 +9,5 @@ import { LightbulbService } from './service/lightbulb.service';
 export class AppComponent implements OnInit{
     constructor(private lightbulbService: LightbulbService) {}
     ngOnInit(): void {
-        this.lightbulbService.getListofLightbulbs();
     }
 }

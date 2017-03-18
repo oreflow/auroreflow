@@ -1,0 +1,8 @@
+
+
+<div *ngIf="lightbulb">
+    <h1>{{lightbulb.id}} {{lightbulb.name}}</h1>
+    <input [(ngModel)]="lightbulb.hue" placeholder="hue" (change)="hsvChange()" type="number">
+    <input [(ngModel)]="lightbulb.sat" placeholder="saturation" (change)="hsvChange()" type="number">
+    <input [(ngModel)]="lightbulb.bright" placeholder="brightness" (change)="hsvChange()" type="number">
+</div>

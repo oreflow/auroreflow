@@ -1,0 +1,9 @@
+
+<div *ngFor="let lightbulb of lightbulbs">
+    <div class="">
+        <h4>{{lightbulb.id}}</h4>
+    </div>
+    <div>
+        <a [routerLink]="['/singlelightbulb', lightbulb.id]">{{lightbulb.id}}{{lightbulb.name}}</a>
+    </div>
+</div>
