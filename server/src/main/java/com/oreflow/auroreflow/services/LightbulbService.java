@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 /**
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
 public class LightbulbService {
   private static final Logger logger = Logger.getLogger(LightbulbService.class.getName());
   private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(1);
-  private static final Duration MIN_DELAY_BETWEEN_REQUESTS = Duration.ofMillis(10);
+  private static final Duration MIN_DELAY_BETWEEN_REQUESTS = Duration.ofMillis(300);
 
   private final Map<Long, Lightbulb> lightbulbs;
   private final Map<Long, Long> lastRequestId;
@@ -85,7 +86,7 @@ public class LightbulbService {
    */
   public void sendLightbulbRequest(long lightbulbId, LightbulbRequest lightbulbRequest) {
     if (requestNeedsToBeThrottled(lightbulbId)) {
-      logger.log(Level.INFO, String.format("Request \n%s\n got throttled"), lightbulbRequest);
+      logger.log(Level.INFO, "Request got throttled", lightbulbRequest);
       enqueueThrottledRequest(lightbulbId, lightbulbRequest);
       return;
     }
@@ -146,8 +147,10 @@ public class LightbulbService {
       lastRequestTimes.put(lightbulb.getId(), Instant.now());
       new Thread(() -> {
         try {
-          BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-          LightbulbCommandResponse response = JsonUtil.parseCommandResponse(reader.readLine());
+          String responseMessage = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+              .lines()
+              .collect(Collectors.joining());
+          LightbulbCommandResponse response = JsonUtil.parseCommandResponse(responseMessage);
           if (response.getId() == requestId && !response.getResultList().isEmpty()) {
             logger.log(Level.INFO, "SUCCESS" + response);
             updateLightbulbWith(lightbulb, lightbulbRequest);
@@ -199,6 +202,7 @@ public class LightbulbService {
                 .setHue(lightbulbRequest.getHsvRequest().getHue())
                 .setSat(lightbulbRequest.getHsvRequest().getSat())
                 .setBright(lightbulbRequest.getHsvRequest().getBrightness())
+                .setColorMode(Lightbulb.ColorMode.COLOR_MODE)
                 .build());
         break;
       case CT_REQUEST:
@@ -206,6 +210,7 @@ public class LightbulbService {
             lightbulb.toBuilder()
                 .setHue(lightbulbRequest.getCtRequest().getCt())
                 .setBright(lightbulbRequest.getHsvRequest().getBrightness())
+                .setColorMode(Lightbulb.ColorMode.COLOR_TEMPERATURE_MODE)
                 .build());
         break;
       case POWER_REQUEST:

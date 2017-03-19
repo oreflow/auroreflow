@@ -4,11 +4,13 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharSource;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb;
+import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb.ColorMode;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb.Model;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Power;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+
 
 /**
  * Utility class for prot
@@ -80,6 +82,13 @@ public class Lightbulbs {
           break;
         case "name":
           lightbulbBuilder.setName(split.get(1));
+          break;
+        case "color_mode":
+          if(Integer.parseInt(split.get(1)) == 2) {
+            lightbulbBuilder.setColorMode(ColorMode.COLOR_TEMPERATURE_MODE);
+          } else {
+            lightbulbBuilder.setColorMode(ColorMode.COLOR_MODE);
+          }
           break;
       }
     }
