@@ -4,10 +4,10 @@ import { LightbulbService } from '../../service/lightbulb.service';
 import { Lightbulb } from '../../model/lightbulb';
 
 @Component({
-  template: require('./apartment.component.html'),
-  styles: [require('./apartment.component.scss')],
+  template: require('./lightbulblist.component.html'),
+  styles: [require('./lightbulblist.component.scss')],
 })
-export class ApartmentComponent implements OnInit{
+export class LightbulblistComponent implements OnInit{
     private lightbulbs : Lightbulb[];
 
     constructor(private lightbulbService: LightbulbService) {}

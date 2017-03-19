@@ -1,0 +1,20 @@
+$size: 30px;
+
+
+.power-switch-checkbox {
+  margin: 0;
+  border: 0;
+  -webkit-appearance: none;
+  height: $size;
+  width: $size;
+  background-color: aqua;
+  border-radius: 5px;
+  &[power="ON"] {
+    color: yellow;
+  }
+  &:before {
+    font-family: "Material Icons";
+    content: 'power_settings_new';
+    font-size: $size;
+  }
+}

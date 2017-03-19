@@ -1,0 +1,6 @@
+<div *ngIf="lightbulb">
+    <div class="power-switch-checkbox"
+            [attr.power]="lightbulb.power"
+            (click)="powerToggle()">
+    </div>
+</div>

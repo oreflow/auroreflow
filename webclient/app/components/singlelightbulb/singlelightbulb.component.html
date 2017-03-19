@@ -2,7 +2,19 @@
 
 <div *ngIf="lightbulb">
     <h1>{{lightbulb.id}} {{lightbulb.name}}</h1>
-    <input [(ngModel)]="lightbulb.hue" placeholder="hue" (change)="hsvChange()" type="number">
-    <input [(ngModel)]="lightbulb.sat" placeholder="saturation" (change)="hsvChange()" type="number">
-    <input [(ngModel)]="lightbulb.bright" placeholder="brightness" (change)="hsvChange()" type="number">
+    <h2>{{lightbulb.color_mode}}</h2>
+    <div class="color-view" *ngIf="lightbulb.color_mode === 'COLOR_MODE'">
+        <input [(ngModel)]="lightbulb.hue" placeholder="hue" (change)="hsvChange()" type="number">
+        <input [(ngModel)]="lightbulb.sat" placeholder="saturation" (change)="hsvChange()" type="number">
+        <input [(ngModel)]="lightbulb.bright" placeholder="brightness" (change)="hsvChange()" type="number">
+    </div>
+
+    <br>
+    <div class="color-temperature-view" *ngIf="lightbulb.color_mode === 'COLOR_TEMPERATURE_MODE'">
+        <input [(ngModel)]="lightbulb.ct" placeholder="color temperature" (change)="ctChange()" type="number">
+        <input [(ngModel)]="lightbulb.bright" placeholder="brightness" (change)="ctChange()" type="number">
+    </div>
+
+    <br>
+    <hsv-ct-toggle [id]="lightbulb.id"></hsv-ct-toggle>
 </div>

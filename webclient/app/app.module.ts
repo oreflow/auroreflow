@@ -8,18 +8,30 @@ import { LightbulbService } from './service/lightbulb.service';
 
 import { AppComponent } from './app.component';
 import { SingleLightbulbComponent } from './components/singlelightbulb/singlelightbulb.component';
-import { ApartmentComponent } from './components/apartment/apartment.component';
+import { LightbulblistComponent } from './components/lightbulblist/lightbulblist.component';
+import { ToggleSwitchComponent } from "./components/toggleswitch/toggleswitch.component";
+import { HsvCtToggleComponent } from "./components/hsvcttoggle/hsvcttoggle.component";
+import { HsvControlComponent } from "./components/hsvcontrol/hsvcontrol.component";
+import { CtControlComponent } from "./components/ctcontrol/ctcontrol.component";
+import {PowerControlComponent} from "./components/powercontrol/powercontrol.component";
+import {SliderComponent} from "./components/slider/slider.component";
 
 const appRoutes: Routes = [
   { path: 'singlelightbulb/:id', component: SingleLightbulbComponent },
-  { path: '', component: ApartmentComponent }
+  { path: '', component: LightbulblistComponent }
 ];
 
 @NgModule({
     declarations: [
         AppComponent,
         SingleLightbulbComponent,
-        ApartmentComponent
+        LightbulblistComponent,
+        ToggleSwitchComponent,
+        HsvCtToggleComponent,
+        HsvControlComponent,
+        CtControlComponent,
+        PowerControlComponent,
+        SliderComponent,
     ],
     imports: [
         BrowserModule,
@@ -28,10 +40,10 @@ const appRoutes: Routes = [
         RouterModule.forRoot(appRoutes),
   ],
   providers: [
-      LightbulbService
+      LightbulbService,
   ],
   bootstrap: [
-      AppComponent
+      AppComponent,
   ]
 })
 export class AppModule { }

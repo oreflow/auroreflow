@@ -10,6 +10,7 @@ import { Lightbulb } from '../../model/lightbulb';
 })
 export class SingleLightbulbComponent implements OnInit {
     private lightbulb : Lightbulb;
+    toggleSwitchValue: boolean = true;
 
     constructor(
         private route: ActivatedRoute,
@@ -28,8 +29,13 @@ export class SingleLightbulbComponent implements OnInit {
         });
     }
     hsvChange(): void {
-        console.log(this.lightbulb);
         this.lightbulbService.sendHsvUpdate(this.lightbulb);
     }
+    ctChange(): void {
+        this.lightbulbService.sendCtUpdate(this.lightbulb);
+    }
 
+    toggleHandler(toggled: boolean): void {
+        console.log("toggled value change", toggled);
+    }
 }

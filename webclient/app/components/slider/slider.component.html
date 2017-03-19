@@ -1,0 +1,11 @@
+<div class="slider">
+    <div class="slider-bar" #sliderBar
+         [ngStyle]="{'background': background}"
+         (mousedown)="sliderMouseEvent($event)"
+         (mousemove)="sliderMouseEvent($event)"
+         (touchstart)="sliderTouchEvent($event)"
+         (touchmove)="sliderTouchEvent($event)">
+        <div class="slider-indicator"
+             [ngStyle]="{'left': sliderOffset}"></div>
+    </div>
+</div>

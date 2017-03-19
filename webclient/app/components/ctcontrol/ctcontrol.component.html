@@ -1,0 +1,16 @@
+<div *ngIf="lightbulb">
+    <div class="slider-wrapper">
+        <slider [background]="ctBackground"
+                [value]="lightbulb.ct"
+                [minValue]="1700"
+                [maxValue]="6500"
+                (onValueChange)="ctChange($event)"></slider>
+    </div>
+    <div class="slider-wrapper">
+        <slider [background]="brightBackground"
+                [value]="lightbulb.bright"
+                [minValue]="1"
+                [maxValue]="100"
+                (onValueChange)="brightnessChange($event)"></slider>
+    </div>
+</div>

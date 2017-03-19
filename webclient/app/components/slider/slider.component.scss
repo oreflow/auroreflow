@@ -1,0 +1,25 @@
+$width: 200px;
+$height: 30px;
+.slider-bar {
+  width: $width;
+  height: $height;
+  background: #FFFFFF;
+  .slider-indicator {
+    border: 1px solid black;
+    border-radius: 3px;
+    height: calc(#{$height} + 6px);
+    width: 10px;
+    position: relative;
+    top: -4px;
+    background: rgba(255,255,255, 0.5);
+    &:before {
+      background: linear-gradient(red,blue);
+      content: '';
+      display: block;
+      height: 100%;
+      position: relative;
+      width: 1px;
+      left: 4px;
+    }
+  }
+}

@@ -9,6 +9,7 @@ export class Lightbulb {
     ct: number;
     hue: number;
     sat: number;
+    color_mode: string;
     name: string;
     is_active: boolean;
 }

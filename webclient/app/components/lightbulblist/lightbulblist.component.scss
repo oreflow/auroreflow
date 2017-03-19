@@ -1,0 +1,13 @@
+.lightbulb-row {
+  float: left;
+  clear: both;
+  padding: 15px;
+  border: 1px solid purple;
+}
+.lightbulb-row > div {
+  float: left;
+}
+.lightbulb-name {
+  min-width: 200px;
+  padding: 10px;
+}

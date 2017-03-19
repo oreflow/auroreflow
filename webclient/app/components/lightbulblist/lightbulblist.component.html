@@ -1,0 +1,24 @@
+
+<div *ngFor="let lightbulb of lightbulbs" class="lightbulb-row">
+    <div class="lightbulb-name">
+        {{lightbulb.id}} ({{lightbulb.model}})
+    </div>
+    <div *ngIf="lightbulb.color_mode === 'COLOR_MODE'">
+        <hsv-control [id]="lightbulb.id"></hsv-control>
+    </div>
+    <div *ngIf="lightbulb.color_mode === 'COLOR_TEMPERATURE_MODE'">
+        <ct-control [id]="lightbulb.id"></ct-control>
+    </div>
+    <div>
+        <hsv-ct-toggle [id]="lightbulb.id"></hsv-ct-toggle>
+    </div>
+    <div>
+        <power-control [id]="lightbulb.id"></power-control>
+    </div>
+
+<!--
+    <div>
+        <a [routerLink]="['/singlelightbulb', lightbulb.id]">{{lightbulb.id}}{{lightbulb.name}}</a>
+    </div>
+-->
+</div>

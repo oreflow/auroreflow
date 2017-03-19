@@ -22,10 +22,10 @@ module.exports = {
             },
             {
                 test: /\.scss/,
-                loader: ['to-string-loader', 'style-loader', 'css-loader', 'sass-loader']
+                loader: ['to-string-loader', 'css-loader', 'sass-loader']
             },
             {
-                test: /\.jpg$/,
+                test: /\.(jpg|png|woff|ttf|woff2|eot)$/,
                 loader: ['file-loader']
             }
 
