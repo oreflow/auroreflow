@@ -66,11 +66,16 @@ message PowerRequest {
     Power power = 1;
 }
 
+message NameRequest {
+    string name = 1;
+}
+
 message LightbulbRequest {
     oneof request_type {
         HsvRequest hsv_request = 1;
         CtRequest ct_request = 2;
         PowerRequest power_request = 3;
+        NameRequest name_request = 4;
     }
 }
 
@@ -79,3 +84,4 @@ message LightbulbCommandResponse {
     repeated string result = 2;
     repeated string error = 3;
 }
+

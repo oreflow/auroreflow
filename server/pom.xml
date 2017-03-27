@@ -15,6 +15,16 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jettyVersion}</version>
+                <configuration>
+                    <httpConnector>
+                        <port>8080</port>
+                    </httpConnector>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -23,6 +33,7 @@
     <version>1.0-SNAPSHOT</version>
     <properties>
         <guiceVersion>4.1.0</guiceVersion>
+        <jettyVersion>9.4.2.v20170220</jettyVersion>
     </properties>
 
     <dependencies>

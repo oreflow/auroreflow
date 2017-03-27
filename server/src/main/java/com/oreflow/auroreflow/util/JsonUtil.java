@@ -8,6 +8,7 @@ import com.google.protobuf.Message;
 import com.googlecode.protobuf.format.JsonFormat;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbCommandResponse;
+import com.oreflow.auroreflow.proto.AuroreflowProto.NameRequest;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -35,7 +36,7 @@ public final class JsonUtil {
       } else if (element instanceof Number) {
         jsonArray.add((Number) element);
       } else if (element instanceof String) {
-        jsonArray.add(((String) element).toLowerCase());
+        jsonArray.add(((String) element));
       } else if (element instanceof Enum) {
         jsonArray.add(element.toString().toLowerCase());
       } else if (element instanceof Message) {

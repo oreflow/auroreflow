@@ -27,6 +27,7 @@ public class ListLightbulbServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ImmutableCollection<Lightbulb> lightbulbs = lightbulbService.getActiveLightbulbs();
+        lightbulbs.forEach(System.out::println);
         String jsonResponse = jsonArrayOf(lightbulbs.toArray()).toString();
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");

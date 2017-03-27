@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 
 /**
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class LightbulbService {
   private static final Logger logger = Logger.getLogger(LightbulbService.class.getName());
-  private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(1);
+  private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(5);
   private static final Duration MIN_DELAY_BETWEEN_REQUESTS = Duration.ofMillis(300);
 
   private final Map<Long, Lightbulb> lightbulbs;
@@ -74,6 +73,7 @@ public class LightbulbService {
       if (currentSocket.isConnected() && !currentSocket.isClosed()) {
         return currentSocket;
       }
+      currentSocket.close();
     }
     Socket newSocket = new Socket(lightbulb.getIp(), lightbulb.getPort());
     newSocket.setSoTimeout((int) REQUEST_TIMEOUT.toMillis());
@@ -85,21 +85,22 @@ public class LightbulbService {
    * Sends a given {@link LightbulbRequest} to a given lightbulb
    */
   public void sendLightbulbRequest(long lightbulbId, LightbulbRequest lightbulbRequest) {
-    if (requestNeedsToBeThrottled(lightbulbId)) {
+    if (shouldBeThrottled(lightbulbId)) {
       logger.log(Level.INFO, "Request got throttled", lightbulbRequest);
       enqueueThrottledRequest(lightbulbId, lightbulbRequest);
       return;
     }
     final Lightbulb lightbulb = getLightbulb(lightbulbId);
     final long requestId = lastRequestId.getOrDefault(lightbulbId, 0L) + 1;
+    lastRequestTimes.put(lightbulbId, Instant.now());
     lastRequestId.put(lightbulbId, requestId);
-    sendMessage(lightbulb, requestId, lightbulbRequest);
+    sendMessageAsync(lightbulb, requestId, lightbulbRequest);
   }
 
   /**
    * Determines if a request right now to a given lightbulbId needs to be throttled
    */
-  private boolean requestNeedsToBeThrottled(long lightbulbId) {
+  private synchronized boolean shouldBeThrottled(long lightbulbId) {
     final Instant lastRequestTime = lastRequestTimes.getOrDefault(lightbulbId, Instant.EPOCH);
     final Instant nextAllowedTime = lastRequestTime.plus(MIN_DELAY_BETWEEN_REQUESTS);
     return nextAllowedTime.isAfter(Instant.now());
@@ -134,44 +135,34 @@ public class LightbulbService {
   /**
    * Sends a given {@link LightbulbRequest} to a given {@link Lightbulb}
    */
-  private void sendMessage(final Lightbulb lightbulb, final long requestId, final LightbulbRequest lightbulbRequest) {
-    try {
-      final String lightbulbRequestMessage = LightbulbMessages.createMessage(requestId, lightbulbRequest);
-      final Socket socket = getSocketForLightbulb(lightbulb);
-      PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-      logger.log(Level.INFO,
-          String.format("Sending message to \nip %s, port %d\nMessage\n%s\n", lightbulb.getIp(), lightbulb.getPort(),
-              lightbulbRequestMessage));
-      out.print(lightbulbRequestMessage);
-      out.flush();
-      lastRequestTimes.put(lightbulb.getId(), Instant.now());
-      new Thread(() -> {
-        try {
-          String responseMessage = new BufferedReader(new InputStreamReader(socket.getInputStream()))
-              .lines()
-              .collect(Collectors.joining());
-          LightbulbCommandResponse response = JsonUtil.parseCommandResponse(responseMessage);
-          if (response.getId() == requestId && !response.getResultList().isEmpty()) {
-            logger.log(Level.INFO, "SUCCESS" + response);
-            updateLightbulbWith(lightbulb, lightbulbRequest);
+  private void sendMessageAsync(final Lightbulb lightbulb, final long requestId,
+                                final LightbulbRequest lightbulbRequest) {
+    new Thread(() ->{
+      try {
+        // Create and send request
+        final String lightbulbRequestMessage = LightbulbMessages.createMessage(requestId, lightbulbRequest);
+        final Socket socket = getSocketForLightbulb(lightbulb);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        logger.log(Level.INFO, String.format("Sending message to bulb ID %d \nip %s, port %d\nMessage\n%s\n",
+            lightbulb.getId(), lightbulb.getIp(), lightbulb.getPort(), lightbulbRequestMessage));
+        out.print(lightbulbRequestMessage);
+        out.flush();
+        // Read response
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        String responseMessage = reader.readLine();
+        System.out.println(responseMessage);
+        LightbulbCommandResponse response = JsonUtil.parseCommandResponse(responseMessage);
+        updateLightbulbWith(lightbulb, lightbulbRequest);
+        logger.log(Level.INFO, String.format("Got response \n%s", response));
 
-          } else {
-            logger.log(Level.SEVERE,
-                String.format("Got response \n%s\n for another request or non successful response\n" +
-                    " Disregarding results", response));
-          }
-        } catch (SocketTimeoutException e) {
-          logger.log(Level.WARNING,
-              String.format("Got no response for lightbulb %d within given deadline.\n" +
-                  "Marking lightbulb as inactive", lightbulb.getId()));
-          updateLightbulb(lightbulb.toBuilder().setIsActive(false).build());
-        } catch (IOException e) {
-          logger.log(Level.SEVERE, "Error when trying to read response from lightbulb" + e.getMessage());
-        }
-      }).start();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+      } catch (SocketTimeoutException e) {
+        logger.log(Level.WARNING, String.format("Got no response for lightbulb %d within given deadline.\n" +
+                "Marking lightbulb as inactive", lightbulb.getId()));
+        updateLightbulb(lightbulb.toBuilder().setIsActive(false).build());
+      } catch (IOException e) {
+        logger.log(Level.SEVERE, "Error when trying to read response from lightbulb" + e.getMessage());
+      }
+    }).start();
   }
 
   /**
@@ -208,8 +199,8 @@ public class LightbulbService {
       case CT_REQUEST:
         updateLightbulb(
             lightbulb.toBuilder()
-                .setHue(lightbulbRequest.getCtRequest().getCt())
-                .setBright(lightbulbRequest.getHsvRequest().getBrightness())
+                .setCt(lightbulbRequest.getCtRequest().getCt())
+                .setBright(lightbulbRequest.getCtRequest().getBrightness())
                 .setColorMode(Lightbulb.ColorMode.COLOR_TEMPERATURE_MODE)
                 .build());
         break;
@@ -219,17 +210,23 @@ public class LightbulbService {
                 .setPower(lightbulbRequest.getPowerRequest().getPower())
                 .build());
         break;
+      case NAME_REQUEST:
+        updateLightbulb(
+            lightbulb.toBuilder()
+                .setName(lightbulbRequest.getNameRequest().getName())
+                .build());
+        break;
       case REQUESTTYPE_NOT_SET:
         updateLightbulb(lightbulb.toBuilder().setIsActive(true).build());
         break;
     }
-    lightbulbs.put(lightbulb.getId(), lightbulb);
   }
 
   /**
    * Updates stored {@link Lightbulb}
    */
   public void updateLightbulb(Lightbulb lightbulb) {
+    System.out.println("PUTTING" + lightbulb);
     lightbulbs.put(lightbulb.getId(), lightbulb);
   }
 

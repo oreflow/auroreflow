@@ -52,6 +52,8 @@ public final class LightbulbMessages {
             lightbulbRequest.getCtRequest().getBrightness());
       case POWER_REQUEST:
         return createSetPower(id, lightbulbRequest.getPowerRequest().getPower());
+      case NAME_REQUEST:
+        return createSetName(id, lightbulbRequest.getNameRequest().getName());
       case REQUESTTYPE_NOT_SET:
       default:
         return createGetPower(id);
@@ -86,6 +88,13 @@ public final class LightbulbMessages {
    */
   private static String createGetPower(long id) {
     return createRequestObject(id, "get_prop", jsonArrayOf("power"));
+  }
+
+  /**
+   * set_name 1 string(name)
+   */
+  private static String createSetName(long id, String name) {
+    return createRequestObject(id,"set_name", jsonArrayOf(name));
   }
 
   /**
@@ -199,13 +208,6 @@ public final class LightbulbMessages {
     throw new NotImplementedException();
   }
 
-  /**
-   * set_name 1 string(name)
-   */
-  @Deprecated
-  private static String createSetName(long id, String name) {
-    return createRequestObject(id,"set_name", jsonArrayOf(name));
-  }
 
   /**
    * Builds the actual request object with given id, method and params

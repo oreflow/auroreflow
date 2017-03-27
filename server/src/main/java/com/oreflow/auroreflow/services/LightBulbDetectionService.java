@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class LightBulbDetectionService {
   private static final Logger logger = Logger.getLogger(LightBulbDetectionService.class.getName());
 
-  private static final Duration POLLING_INTERVAL = Duration.ofMinutes(1);
+  private static final Duration POLLING_INTERVAL = Duration.ofSeconds(30);
   private static final int BROADCAST_PORT = 1982;
   private static final String BROADCAST_ADDRESS = "239.255.255.250";
   private static final byte [] BROADCAST_MESSAGE = (""
