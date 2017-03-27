@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Service to manage
+ * Service to manage Lightbulbs
  */
 @Singleton
 public class LightbulbService {
@@ -134,6 +134,8 @@ public class LightbulbService {
 
   /**
    * Sends a given {@link LightbulbRequest} to a given {@link Lightbulb}
+   * TODO: Right now the server is naive and updates the current lightbulbvalues for whatever value it gets back
+   *   Implement support so that updates are only made when we get response for specific requestId
    */
   private void sendMessageAsync(final Lightbulb lightbulb, final long requestId,
                                 final LightbulbRequest lightbulbRequest) {

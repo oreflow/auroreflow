@@ -16,8 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Singleton
-public class LightBulbDetectionService {
-  private static final Logger logger = Logger.getLogger(LightBulbDetectionService.class.getName());
+public class LightbulbDetectionService {
+  private static final Logger logger = Logger.getLogger(LightbulbDetectionService.class.getName());
 
   private static final Duration POLLING_INTERVAL = Duration.ofSeconds(30);
   private static final int BROADCAST_PORT = 1982;
@@ -35,7 +35,7 @@ public class LightBulbDetectionService {
   private Instant lastPollInstant;
 
   @Inject
-  public LightBulbDetectionService(LightbulbService lightbulbService) throws IOException {
+  public LightbulbDetectionService(LightbulbService lightbulbService) throws IOException {
     this.lightbulbService = lightbulbService;
     lastPollInstant = Instant.EPOCH;
     socket = new MulticastSocket(BROADCAST_PORT);
