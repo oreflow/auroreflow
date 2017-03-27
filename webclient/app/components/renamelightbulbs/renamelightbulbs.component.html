@@ -1,0 +1,15 @@
+
+<div *ngFor="let lightbulb of lightbulbs" class="lightbulb-row">
+    <div class="lightbulb-id">
+        {{lightbulb.id}}
+    </div>
+    <div class="lightbulb-model">
+        ({{lightbulb.model}})
+    </div>
+    <div class="lightbulb-name">
+        <editable-name [id]="lightbulb.id"></editable-name>
+    </div>
+    <div>
+        <power-control [id]="lightbulb.id"></power-control>
+    </div>
+</div>

@@ -19,7 +19,8 @@ export class SliderComponent implements OnInit {
     ngOnInit(): void {
         let sliderElementWidth = ((this.sliderElement as any).nativeElement as HTMLDivElement).clientWidth;
         let intervalSize = (this.maxValue - this.minValue + 1);
-        this.sliderOffset = (this.value / intervalSize) * sliderElementWidth + 'px';
+        console.log(this.value, intervalSize, this.maxValue, this.minValue);
+        this.sliderOffset = ((this.value - this.minValue) / intervalSize) * sliderElementWidth + 'px';
     }
 
     sliderMouseEvent(event:MouseEvent) {

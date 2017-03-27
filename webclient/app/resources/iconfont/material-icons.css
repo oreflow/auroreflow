@@ -1,20 +1,15 @@
-html, body, auroreflow-app {
-    margin: 0;
-    height: 100%;
-    width: 100%;
-}
-
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url(resources/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: url(MaterialIcons-Regular.eot); /* For IE6-8 */
   src: local('Material Icons'),
        local('MaterialIcons-Regular'),
-       url(resources/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
-       url(resources/iconfont/MaterialIcons-Regular.woff) format('woff'),
-       url(resources/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+       url(MaterialIcons-Regular.woff2) format('woff2'),
+       url(MaterialIcons-Regular.woff) format('woff'),
+       url(MaterialIcons-Regular.ttf) format('truetype');
 }
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;

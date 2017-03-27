@@ -13,11 +13,14 @@ import { ToggleSwitchComponent } from "./components/toggleswitch/toggleswitch.co
 import { HsvCtToggleComponent } from "./components/hsvcttoggle/hsvcttoggle.component";
 import { HsvControlComponent } from "./components/hsvcontrol/hsvcontrol.component";
 import { CtControlComponent } from "./components/ctcontrol/ctcontrol.component";
-import {PowerControlComponent} from "./components/powercontrol/powercontrol.component";
-import {SliderComponent} from "./components/slider/slider.component";
+import { PowerControlComponent } from "./components/powercontrol/powercontrol.component";
+import { SliderComponent } from "./components/slider/slider.component";
+import { EditableNameComponent } from "./components/editablename/editablename.component";
+import { RenameLightbulbsComponent } from "./components/renamelightbulbs/renamelightbulbs.component";
 
 const appRoutes: Routes = [
   { path: 'singlelightbulb/:id', component: SingleLightbulbComponent },
+  { path: 'renamelightbulbs', component: RenameLightbulbsComponent },
   { path: '', component: LightbulblistComponent }
 ];
 
@@ -26,10 +29,12 @@ const appRoutes: Routes = [
         AppComponent,
         SingleLightbulbComponent,
         LightbulblistComponent,
+        RenameLightbulbsComponent,
         ToggleSwitchComponent,
         HsvCtToggleComponent,
         HsvControlComponent,
         CtControlComponent,
+        EditableNameComponent,
         PowerControlComponent,
         SliderComponent,
     ],

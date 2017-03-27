@@ -1,0 +1,11 @@
+.toggle-label, toggle-switch {
+  float: left;
+}
+.toggle-label {
+  margin: 5px;
+}
+.disabled {
+  .toggle-label {
+    color: darkgray;
+  }
+}

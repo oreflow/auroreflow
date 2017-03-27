@@ -1,7 +1,9 @@
 
 <div *ngFor="let lightbulb of lightbulbs" class="lightbulb-row">
     <div class="lightbulb-name">
-        {{lightbulb.id}} ({{lightbulb.model}})
+        <span *ngIf="!lightbulb.name">{{lightbulb.id}}</span>
+        <span *ngIf="lightbulb.name">{{lightbulb.name}}</span>
+        ({{lightbulb.model}})
     </div>
     <div *ngIf="lightbulb.color_mode === 'COLOR_MODE'">
         <hsv-control [id]="lightbulb.id"></hsv-control>

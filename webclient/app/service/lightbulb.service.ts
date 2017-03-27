@@ -52,6 +52,18 @@ export class LightbulbService {
     }
 
     /**
+     * Sends a Request to change the name the name set in provided Lightbulb object
+     */
+    sendNameRequest(lightbulb: Lightbulb): void {
+        this.sendUpdateRequest(lightbulb.id,
+            {
+                name_request: {
+                    name: lightbulb.name
+                }
+            });
+    }
+
+    /**
      * Sends a Hsv update request using the HSV values provided in the Lightbulb object
      */
     sendHsvUpdate(lightbulb: Lightbulb): void {
