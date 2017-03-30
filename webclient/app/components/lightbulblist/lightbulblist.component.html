@@ -1,20 +1,20 @@
 
 <div *ngFor="let lightbulb of lightbulbs" class="lightbulb-row">
-    <div class="lightbulb-name">
+    <div class="lightbulb-name disable-select">
         <span *ngIf="!lightbulb.name">{{lightbulb.id}}</span>
         <span *ngIf="lightbulb.name">{{lightbulb.name}}</span>
         ({{lightbulb.model}})
     </div>
-    <div *ngIf="lightbulb.color_mode === 'COLOR_MODE'">
+    <div class="hsv-control-wrapper disable-select" *ngIf="lightbulb.colorMode === 'COLOR_MODE'">
         <hsv-control [id]="lightbulb.id"></hsv-control>
     </div>
-    <div *ngIf="lightbulb.color_mode === 'COLOR_TEMPERATURE_MODE'">
+    <div class="ct-control-wrapper disable-select" *ngIf="lightbulb.colorMode === 'COLOR_TEMPERATURE_MODE'">
         <ct-control [id]="lightbulb.id"></ct-control>
     </div>
     <div>
         <hsv-ct-toggle [id]="lightbulb.id"></hsv-ct-toggle>
     </div>
-    <div>
+    <div class="power-control-wrapper">
         <power-control [id]="lightbulb.id"></power-control>
     </div>
 

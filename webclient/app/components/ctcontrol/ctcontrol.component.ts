@@ -8,7 +8,7 @@ import {LightbulbService} from "../../service/lightbulb.service";
     styles: [require('./ctcontrol.component.scss')],
 })
 export class CtControlComponent implements OnInit{
-    @Input() id: number;
+    @Input() id: string;
     private lightbulb: Lightbulb;
     private ctBackground = '-webkit-linear-gradient(left,#FF7A00, #FF8200, #FF9D3C, #FFA448, #FFAA54, #FFB569, #FFBC76, #FFC07F, #FFD4A8, #FFE5CE, #FFE5CE, #FFF0E8, #FFF6F6, #FFF9FF, #E2E8FF )';
     private brightBackground = '-webkit-linear-gradient(left, #000000, #FFFF00)';

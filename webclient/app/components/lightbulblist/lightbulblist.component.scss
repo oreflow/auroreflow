@@ -1,13 +1,25 @@
 .lightbulb-row {
-  float: left;
   clear: both;
   padding: 15px;
   border: 1px solid purple;
-}
-.lightbulb-row > div {
-  float: left;
+  & > div {
+    display: inline-block;
+  }
 }
 .lightbulb-name {
-  min-width: 200px;
+  font-size: 24px;
+  width: 20%;
   padding: 10px;
+  overflow: hidden;
+  color: white;
+  cursor: default;
+}
+
+.hsv-control-wrapper,.ct-control-wrapper {
+  width: 40%;
+  height: 40px;
+}
+.power-control-wrapper {
+  float: right;
+  margin-right: 20px;
 }

@@ -6,6 +6,7 @@
                 [maxValue]="359"
                 (onValueChange)="hueChange($event)"></slider>
     </div>
+    <div class="slider-margin disable-select">MARGIN</div>
     <div class="slider-wrapper">
         <slider [background]="satBackground"
                 [value]="lightbulb.sat"
@@ -13,8 +14,8 @@
                 [maxValue]="100"
                 (onValueChange)="satChange($event)"></slider>
     </div>
+    <div class="slider-margin disable-select">MARGIN</div>
     <div class="slider-wrapper">
-
         <slider [background]="brightBackground"
                 [value]="lightbulb.bright"
                 [minValue]="1"

@@ -9,7 +9,7 @@ import {LightbulbService} from "../../service/lightbulb.service";
 })
 export class EditableNameComponent implements OnInit {
 
-    @Input() id: number;
+    @Input() id: string;
     private lightbulb: Lightbulb;
 
     constructor(private lightbulbService: LightbulbService) {}

@@ -20,7 +20,7 @@ export class SingleLightbulbComponent implements OnInit {
         console.log("initing");
         console.log(this.route);
         this.route.params.subscribe(params => {
-            let id = +params['id'];
+            let id = params['id'];
             this.lightbulbService.getLightbulb(id)
                 .then(bulb => {
                     this.lightbulb = bulb;

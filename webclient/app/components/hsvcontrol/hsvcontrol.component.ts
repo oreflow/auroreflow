@@ -8,7 +8,7 @@ import {LightbulbService} from "../../service/lightbulb.service";
     styles: [require('./hsvcontrol.component.scss')],
 })
 export class HsvControlComponent implements OnInit{
-    @Input() id: number;
+    @Input() id: string;
     private lightbulb: Lightbulb;
     private hueBackground = '-webkit-linear-gradient(left, #FF0000, #FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)';
     private SAT_BACKGROUND_TEMPLATE = '-webkit-linear-gradient(left, #888888, hsl($hue,100%,50%))';

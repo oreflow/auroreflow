@@ -1,10 +1,10 @@
 
 <div *ngIf="lightbulb" [class.disabled]="lightbulb.model !== 'COLOR'">
-        <div class="toggle-label">TEMP</div>
+        <div class="toggle-label disable-select">TEMP</div>
         <toggle-switch
-                [toggled]="lightbulb.color_mode == 'COLOR_MODE'"
+                [toggled]="lightbulb.colorMode == 'COLOR_MODE'"
                 [toggleDisabled]="lightbulb.model !== 'COLOR'"
                 (onToggled)="toggleHandler($event)"
         ></toggle-switch>
-        <div class="toggle-label">COLOR</div>
+        <div class="toggle-label disable-select">COLOR</div>
 </div>

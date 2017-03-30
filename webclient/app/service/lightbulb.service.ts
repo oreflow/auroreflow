@@ -38,9 +38,16 @@ export class LightbulbService {
     };
 
     /**
+     * Checks if a given LightbulbId exists
+     */
+    hasLightbulb(id: string): boolean {
+        return !!this.lightbulbs.find(lightbulb => lightbulb.id ==id);
+    }
+
+    /**
      * Gets a specific lightbulb by ID
      */
-    getLightbulb(id: number): Promise<Lightbulb> {
+    getLightbulb(id: string): Promise<Lightbulb> {
         let existing = this.lightbulbs.find(lightbulb => lightbulb.id == id);
         if(existing) {
             return Promise.resolve(existing);
@@ -55,11 +62,11 @@ export class LightbulbService {
      * Sends a Request to change the name the name set in provided Lightbulb object
      */
     sendNameRequest(lightbulb: Lightbulb): void {
-        this.sendUpdateRequest(lightbulb.id,
+        this.sendUpdateRequest(lightbulb,
             {
-                name_request: {
+                nameRequest: {
                     name: lightbulb.name
-                }
+                },
             });
     }
 
@@ -67,71 +74,94 @@ export class LightbulbService {
      * Sends a Hsv update request using the HSV values provided in the Lightbulb object
      */
     sendHsvUpdate(lightbulb: Lightbulb): void {
-        this.sendUpdateRequest(lightbulb.id,
+        lightbulb.power = "ON";
+        this.sendUpdateRequest(lightbulb,
             {
-                hsv_request: {
+                hsvRequest: {
                     hue: lightbulb.hue,
                     sat: lightbulb.sat,
                     brightness: lightbulb.bright,
-                }
+                },
             });
     }
     /**
      * Sends a Ct update request using the Ct values provided in the Lightbulb object
      */
     sendCtUpdate(lightbulb: Lightbulb): void {
-        this.sendUpdateRequest(lightbulb.id,
+        lightbulb.power = "ON";
+        this.sendUpdateRequest(lightbulb,
             {
-                ct_request: {
+                ctRequest: {
                     ct: lightbulb.ct,
                     brightness: lightbulb.bright,
-                }
+                },
             });
     }
     /**
      * Sends a Power update request using the power value provided in the Lightbulb object
      */
     sendPowerUpdate(lightbulb: Lightbulb): void {
-        this.sendUpdateRequest(lightbulb.id,
+        this.sendUpdateRequest(lightbulb,
             {
-                power_request: {
+                powerRequest: {
                     power: lightbulb.power
-                }
+                },
             });
     }
     /**
      * Sends a Name update request using the name value provided in the Lightbulb object
      */
     sendNameUpdate(lightbulb: Lightbulb): void {
-        this.sendUpdateRequest(lightbulb.id,
+        this.sendUpdateRequest(lightbulb,
             {
-                name_request: {
+                nameRequest: {
                     name: lightbulb.name
-                }
+                },
             });
     }
 
     /**
      * Sends a provided LightbulbRequest to the API
      */
-    private sendUpdateRequest(id: number, request: LightbulbRequest): void {
+    private sendUpdateRequest(lightbulb: Lightbulb, request: LightbulbRequest): void {
+        let requestTime = new Date().getTime();
+        lightbulb.lastChangeMillis = "" + requestTime;
+        request.requestTime = requestTime;
         this.http
-            .put('lightbulb/update/' + id,
+            .put('lightbulb/update/' + lightbulb.id,
                 JSON.stringify(request),
                 { headers: this.PUT_HEADERS })
             .map((res: Response) => res.json().data as Lightbulb[])
             .toPromise();
     }
 
+    /**
+     * Sends a power off all bulbs request
+     */
+    sendPowerOffAll(): void {
+        this.http.get('poweroff').toPromise();
+    }
+
 
     /**
      * Puts a lightbulb into the list of lightbulbs, replaces existing lightbulb if it already exists
-     * //TODO, merge instead of replace to not loose object references
      */
     putLightbulb(lightbulb: Lightbulb) {
-        let existingIndex = this.lightbulbs.findIndex(bulb => bulb.id === lightbulb.id);
+        const existingIndex = this.lightbulbs.findIndex(bulb => bulb.id === lightbulb.id);
         if(existingIndex >= 0) {
-            this.lightbulbs[existingIndex] = lightbulb;
+            const existingLightbulb = this.lightbulbs[existingIndex];
+            if(!existingLightbulb.lastChangeMillis
+                || existingLightbulb.lastChangeMillis < lightbulb.lastChangeMillis) {
+                existingLightbulb.power = lightbulb.power;
+                existingLightbulb.bright = lightbulb.bright;
+                existingLightbulb.ct = lightbulb.ct;
+                existingLightbulb.hue = lightbulb.hue;
+                existingLightbulb.sat = lightbulb.sat;
+                existingLightbulb.colorMode = lightbulb.colorMode;
+                existingLightbulb.isActive = lightbulb.isActive;
+                existingLightbulb.name = lightbulb.name;
+                existingLightbulb.lastChangeMillis = lightbulb.lastChangeMillis;
+            }
         } else {
             this.lightbulbs.push(lightbulb);
         }
@@ -141,7 +171,7 @@ export class LightbulbService {
     createMockLightbulb(id: number): Lightbulb {
         console.log('creating bulb with ID', id);
         return {
-            id: id,
+            id: "" + id,
             model: id > 10 ? "COLOR" : "MONO",
             location: "yeelight://192.168.0.179:55443",
             ip: "192.168.0.179",
@@ -151,9 +181,10 @@ export class LightbulbService {
             ct: 4000,
             hue: 150,
             sat: 100,
-            color_mode: id > 10 ? "COLOR_MODE" : "COLOR_TEMPERATURE_MODE",
-            is_active: true,
-            name: "what up!" + id
+            colorMode: id > 10 ? "COLOR_MODE" : "COLOR_TEMPERATURE_MODE",
+            isActive: true,
+            name: "what up!" + id,
+            lastChangeMillis: "0"
         };
     }
 }

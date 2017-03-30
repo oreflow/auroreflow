@@ -1,5 +1,5 @@
 export class Lightbulb {
-    id: number;
+    id: string;
     model: string;
     location: string;
     ip: string;
@@ -9,7 +9,8 @@ export class Lightbulb {
     ct: number;
     hue: number;
     sat: number;
-    color_mode: string;
+    colorMode: string;
     name: string;
-    is_active: boolean;
+    isActive: boolean;
+    lastChangeMillis: string;
 }

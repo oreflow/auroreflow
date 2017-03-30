@@ -1,13 +1,19 @@
-$width: 200px;
-$height: 30px;
+$width: 100%;
+$height: 100%;
+.slider {
+  height: 100%;
+  min-height: 20px;
+  min-width: 100px;
+  width: 100%;
+  display: inline-grid;
+}
 .slider-bar {
-  width: $width;
-  height: $height;
+  width: 100%;
+  height: 100%;
   background: #FFFFFF;
   .slider-indicator {
     border: 1px solid black;
-    border-radius: 3px;
-    height: calc(#{$height} + 6px);
+    height: calc(100% + 6px);
     width: 10px;
     position: relative;
     top: -4px;

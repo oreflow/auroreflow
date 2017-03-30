@@ -8,7 +8,7 @@ import {LightbulbService} from "../../service/lightbulb.service";
     styles: [require('./powercontrol.component.scss')],
 })
 export class PowerControlComponent implements OnInit{
-    @Input() id: number;
+    @Input() id: string;
     private lightbulb: Lightbulb;
 
     constructor(private lightbulbService: LightbulbService) {}

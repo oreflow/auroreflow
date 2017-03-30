@@ -9,7 +9,7 @@ import {LightbulbService} from "../../service/lightbulb.service";
 })
 export class HsvCtToggleComponent implements OnInit {
 
-    @Input() id: number;
+    @Input() id: string;
     private lightbulb: Lightbulb;
 
     constructor(private lightbulbService: LightbulbService) {}
@@ -20,10 +20,10 @@ export class HsvCtToggleComponent implements OnInit {
 
     toggleHandler(toggled: boolean) {
         if(toggled) {
-            this.lightbulb.color_mode = 'COLOR_MODE';
+            this.lightbulb.colorMode = 'COLOR_MODE';
             this.lightbulbService.sendHsvUpdate(this.lightbulb);
         } else {
-            this.lightbulb.color_mode = 'COLOR_TEMPERATURE_MODE';
+            this.lightbulb.colorMode = 'COLOR_TEMPERATURE_MODE';
             this.lightbulbService.sendCtUpdate(this.lightbulb);
         }
     }

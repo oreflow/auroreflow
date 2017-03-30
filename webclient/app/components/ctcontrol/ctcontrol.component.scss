@@ -1,4 +1,15 @@
+div {
+  height: 100%;
+  width: 100%;
+  display: inline-block;
+}
 .slider-wrapper {
-  float: left;
-  margin-left: 10px;
+  height: 100%;
+  width:46%;
+}
+.slider-margin {
+  height: 100%;
+  width: 4%;
+  opacity: 0;
+  cursor: default;
 }

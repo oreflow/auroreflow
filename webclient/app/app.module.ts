@@ -17,6 +17,7 @@ import { PowerControlComponent } from "./components/powercontrol/powercontrol.co
 import { SliderComponent } from "./components/slider/slider.component";
 import { EditableNameComponent } from "./components/editablename/editablename.component";
 import { RenameLightbulbsComponent } from "./components/renamelightbulbs/renamelightbulbs.component";
+import {WebsocketService} from "./service/websocket.service";
 
 const appRoutes: Routes = [
   { path: 'singlelightbulb/:id', component: SingleLightbulbComponent },
@@ -42,10 +43,11 @@ const appRoutes: Routes = [
         BrowserModule,
         FormsModule,
         HttpModule,
-        RouterModule.forRoot(appRoutes),
+        RouterModule.forRoot(appRoutes, { useHash: true }),
   ],
   providers: [
       LightbulbService,
+      WebsocketService,
   ],
   bootstrap: [
       AppComponent,

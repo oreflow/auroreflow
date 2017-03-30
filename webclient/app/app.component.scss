@@ -1,10 +1,26 @@
 .top-bar {
   height: 50px;
-  background-color: cyan;
+  background: linear-gradient(cyan, darkgray);
+  .nav-bar-button {
+    padding: 10px;
+    float: left;
+  }
+  .poweroff-button {
+    float: right;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+  }
 }
 .app-body {
-    background-color: lightblue;
+    background: linear-gradient(darkgray, gray);
     font-family: Verdana;
     height: 100%;
     width: 100%;
+  ng-component {
+    height: 100%;
+    width: 100%;
+  }
 }
+
+
