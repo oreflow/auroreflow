@@ -30,12 +30,14 @@ public class LightbulbDetectionService {
 
   private final MulticastSocket socket;
   private final DatagramPacket broadcastPacket;
+  private final LightbulbSocketService lightbulbSocketService;
   private final LightbulbService lightbulbService;
 
   private Instant lastPollInstant;
 
   @Inject
-  public LightbulbDetectionService(LightbulbService lightbulbService) throws IOException {
+  public LightbulbDetectionService(LightbulbSocketService lightbulbSocketService, LightbulbService lightbulbService) throws IOException {
+    this.lightbulbSocketService = lightbulbSocketService;
     this.lightbulbService = lightbulbService;
     lastPollInstant = Instant.EPOCH;
     socket = new MulticastSocket(BROADCAST_PORT);
@@ -76,9 +78,9 @@ public class LightbulbDetectionService {
       broadcastForLightbulbs();
     }
     for (Lightbulb lightbulb : activeLightbulbs) {
-      Instant lastRequestInstant = lightbulbService.getLastRequestInstantOrDefault(lightbulb.getId());
+      Instant lastRequestInstant = lightbulbSocketService.getLastSentRequestInstantOrEpoch(lightbulb.getId());
       if (lastRequestInstant.isBefore(lastPollInstant)) {
-          lightbulbService.sendLightbulbRequest(lightbulb.getId(), LightbulbRequest.getDefaultInstance());
+          lightbulbSocketService.sendLightbulbRequest(lightbulb, LightbulbRequest.getDefaultInstance());
       }
     }
   }
@@ -89,7 +91,7 @@ public class LightbulbDetectionService {
   private void broadcastListenerImpl() {
     logger.log(Level.INFO, "Starting Broadcast listener");
     while (true) {
-      byte[] recvBuf = new byte[1024];
+      byte[] recvBuf = new byte[2048];
       DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
       try {
         socket.receive(receivePacket);
@@ -109,7 +111,7 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Sends a broadcast message to request all active lightbulbs on the network to advertise themselves
+   * Sends a broadcast message to lightbulbRequest all active lightbulbs on the network to advertise themselves
    */
   private void broadcastForLightbulbs(){
     try {

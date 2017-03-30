@@ -3,20 +3,26 @@ package com.oreflow.auroreflow.util;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import com.googlecode.protobuf.format.JsonFormat;
+import com.google.protobuf.util.JsonFormat;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbCommandResponse;
-import com.oreflow.auroreflow.proto.AuroreflowProto.NameRequest;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class JsonUtil {
-  private static final JsonFormat protobufJsonFormatter = new JsonFormat();
+  private static final JsonFormat.Printer protobufJsonPrinter = JsonFormat.printer().includingDefaultValueFields();
+  private static final JsonFormat.Parser protobufJsonParser = JsonFormat.parser();
+
   private static final JsonParser jsonParser = new JsonParser();
   private JsonUtil() {}
 
@@ -40,7 +46,12 @@ public final class JsonUtil {
       } else if (element instanceof Enum) {
         jsonArray.add(element.toString().toLowerCase());
       } else if (element instanceof Message) {
-        String protobufJsonString = protobufJsonFormatter.printToString((Message) element);
+        String protobufJsonString = null;
+        try {
+          protobufJsonString = protobufJsonPrinter.print((Message) element);
+        } catch (InvalidProtocolBufferException e) {
+          e.printStackTrace();
+        }
         jsonArray.add(jsonParser.parse(protobufJsonString));
       } else {
         throw new IllegalArgumentException("Tried to Json-serialize unsupported type " + element.getClass().getName());
@@ -49,23 +60,25 @@ public final class JsonUtil {
     return jsonArray;
   }
 
+  private final static Pattern commandResponseMatcher =
+      Pattern.compile("\\{\"id\":[0-9]*, \"result\":\\[\"ok\"\\]\\}");
+  public static boolean isCommandResponse(String message) {
+    return commandResponseMatcher.matcher(message).matches();
+  }
+
   /**
    * Parses a Lighbulb command response from JSON to {@link LightbulbCommandResponse}
    */
-  public static LightbulbCommandResponse parseCommandResponse(String responseMessage) throws IOException {
-    InputStream messageStream = new ByteArrayInputStream(responseMessage.getBytes());
-    LightbulbCommandResponse.Builder builder = LightbulbCommandResponse.newBuilder();
-    protobufJsonFormatter.merge(messageStream, builder);
-    return builder.build();
+  public static long parseCommandResponseId(String responseMessage) {
+    return new JsonParser().parse(responseMessage).getAsJsonObject().get("id").getAsLong();
   }
 
   /**
    * Parses a JSON LightbulbRequest to {@link LightbulbRequest}
    */
   public static LightbulbRequest parseLightbulbRequest(BufferedReader message) throws IOException {
-    InputStream targetStream = new ByteArrayInputStream(CharStreams.toString(message).getBytes());
     LightbulbRequest.Builder builder = LightbulbRequest.newBuilder();
-    protobufJsonFormatter.merge(targetStream, builder);
+    protobufJsonParser.merge(message.lines().collect(Collectors.joining()), builder);
     return builder.build();
   }
 
@@ -73,6 +86,11 @@ public final class JsonUtil {
    * Formats a protobuf {@link Message} as a JSON String
    */
   public static String toJSON(Message message) {
-    return protobufJsonFormatter.printToString(message);
+    try {
+      return protobufJsonPrinter.print(message);
+    } catch (InvalidProtocolBufferException e) {
+      e.printStackTrace();
+      return "";
+    }
   }
 }

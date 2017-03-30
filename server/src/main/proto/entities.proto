@@ -49,6 +49,9 @@ message Lightbulb {
     string name = 12;
     // If the lightbulb responded to the last call
     bool is_active = 13;
+
+    // Last change in EPOCH millis
+    int64 last_change_millis = 14;
 }
 
 message HsvRequest {
@@ -77,6 +80,7 @@ message LightbulbRequest {
         PowerRequest power_request = 3;
         NameRequest name_request = 4;
     }
+    int64 request_time = 5;
 }
 
 message LightbulbCommandResponse {

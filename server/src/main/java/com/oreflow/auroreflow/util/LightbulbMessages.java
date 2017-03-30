@@ -2,10 +2,16 @@ package com.oreflow.auroreflow.util;
 
 import com.google.common.base.Verify;
 import com.google.gson.*;
+import com.oreflow.auroreflow.proto.AuroreflowProto;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Power;
+import com.oreflow.auroreflow.proto.AuroreflowProto.PowerRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
+import com.oreflow.auroreflow.proto.AuroreflowProto.CtRequest;
+import com.oreflow.auroreflow.proto.AuroreflowProto.HsvRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Effect;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.time.Instant;
 
 import static com.oreflow.auroreflow.util.JsonUtil.jsonArrayOf;
 
@@ -219,4 +225,31 @@ public final class LightbulbMessages {
     json.add("params", params);
     return json.toString() + "\r\n";
   }
+
+  public static LightbulbRequest createRestoreRequest(AuroreflowProto.Lightbulb lightbulb) {
+    if(lightbulb.getPower().equals(Power.OFF)) {
+      return LightbulbRequest.newBuilder().setPowerRequest(PowerRequest.newBuilder().setPower(Power.OFF)).build();
+    }
+    switch (lightbulb.getColorMode()) {
+      case COLOR_TEMPERATURE_MODE:
+        return LightbulbRequest.newBuilder()
+            .setCtRequest(
+                CtRequest.newBuilder()
+                .setCt(lightbulb.getCt())
+                .setBrightness(lightbulb.getBright()))
+            .setRequestTime(Instant.now().toEpochMilli())
+            .build();
+      case COLOR_MODE:
+        return LightbulbRequest.newBuilder()
+            .setHsvRequest(
+                HsvRequest.newBuilder()
+                    .setHue(lightbulb.getHue())
+                    .setSat(lightbulb.getSat())
+                    .setBrightness(lightbulb.getBright()))
+            .setRequestTime(Instant.now().toEpochMilli())
+            .build();
+    }
+    throw new IllegalArgumentException("Cannot restore state of lighbulb with power on and non CT or HSV");
+  }
+
 }

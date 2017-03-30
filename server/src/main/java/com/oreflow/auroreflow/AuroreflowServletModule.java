@@ -3,7 +3,7 @@ package com.oreflow.auroreflow;
 import com.google.inject.servlet.ServletModule;
 import com.oreflow.auroreflow.servlets.*;
 
-public class AuroreflowServletModule extends ServletModule{
+public class AuroreflowServletModule extends ServletModule {
   @Override
   protected void configureServlets() {
     serve("/lightbulb/update/*").with(UpdateLightbulbServlet.class);

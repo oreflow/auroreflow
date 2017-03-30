@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
 import com.oreflow.auroreflow.services.LightbulbService;
+import com.oreflow.auroreflow.services.LightbulbSocketService;
 import com.oreflow.auroreflow.util.JsonUtil;
 import com.oreflow.auroreflow.util.LightbulbMessages;
 
@@ -15,11 +16,11 @@ import java.io.IOException;
 
 @Singleton
 public class UpdateLightbulbServlet extends HttpServlet {
-  private final LightbulbService lightbulbService;
+  private final LightbulbSocketService lightbulbSocketService;
 
   @Inject
-  public UpdateLightbulbServlet(LightbulbService lightbulbService) {
-    this.lightbulbService = lightbulbService;
+  public UpdateLightbulbServlet(LightbulbSocketService lightbulbSocketService) {
+    this.lightbulbSocketService = lightbulbSocketService;
   }
 
   @Override
@@ -28,7 +29,9 @@ public class UpdateLightbulbServlet extends HttpServlet {
     LightbulbRequest lightbulbRequest = JsonUtil.parseLightbulbRequest(req.getReader());
     LightbulbMessages.validateLightbulbRequest(lightbulbRequest);
     System.out.printf("Got request with id %d, and message %s", lightbulbId, lightbulbRequest);
-    lightbulbService.sendLightbulbRequest(lightbulbId, lightbulbRequest);
+    lightbulbSocketService.sendLightbulbRequest(lightbulbId, lightbulbRequest);
     resp.setStatus(HttpServletResponse.SC_OK);
+    resp.setContentType("application/json");
+    resp.getOutputStream().write("{}".getBytes());
   }
 }
