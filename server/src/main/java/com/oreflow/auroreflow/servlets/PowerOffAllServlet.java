@@ -36,7 +36,7 @@ public class PowerOffAllServlet extends HttpServlet {
         .setRequestTime(Instant.now().toEpochMilli())
         .build();
 
-    for(Lightbulb lightbulb : lightbulbService.getActiveLightbulbs()) {
+    for(Lightbulb lightbulb : lightbulbService.getAllLightbulbs()) {
       lightbulbSocketService.sendLightbulbRequest(lightbulb, lightbulbRequest);
     }
     resp.setStatus(HttpServletResponse.SC_OK);

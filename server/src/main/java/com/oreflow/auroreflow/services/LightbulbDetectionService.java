@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb;
+import com.oreflow.auroreflow.util.LightbulbMessages;
 import com.oreflow.auroreflow.util.Lightbulbs;
 
 import java.io.*;
@@ -15,11 +16,16 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ */
 @Singleton
 public class LightbulbDetectionService {
   private static final Logger logger = Logger.getLogger(LightbulbDetectionService.class.getName());
 
   private static final Duration POLLING_INTERVAL = Duration.ofSeconds(30);
+  private static final Duration ALLOWED_DELAY = Duration.ofSeconds(5);
+
   private static final int BROADCAST_PORT = 1982;
   private static final String BROADCAST_ADDRESS = "239.255.255.250";
   private static final byte [] BROADCAST_MESSAGE = (""
@@ -59,9 +65,11 @@ public class LightbulbDetectionService {
   private void statusPollingThreadImpl() {
     while (true) {
       try {
-        Thread.sleep(POLLING_INTERVAL.toMillis());
+        Thread.sleep(POLLING_INTERVAL.minus(ALLOWED_DELAY).toMillis());
         pollStatus();
         lastPollInstant = Instant.now();
+        Thread.sleep(ALLOWED_DELAY.toMillis());
+        updateActiveStatus();
       } catch (InterruptedException e) {
         logger.log(Level.SEVERE, "Bulb status polling thread got interrupted");
         return;
@@ -73,7 +81,7 @@ public class LightbulbDetectionService {
    * Polls connection status on all active {@link Lightbulb}s that have not been accessed since the last poll.
    */
   private void pollStatus() {
-    Collection<Lightbulb> activeLightbulbs = lightbulbService.getActiveLightbulbs();
+    Collection<Lightbulb> activeLightbulbs = lightbulbService.getAllLightbulbs();
     if(activeLightbulbs.isEmpty()) {
       broadcastForLightbulbs();
     }
@@ -81,6 +89,23 @@ public class LightbulbDetectionService {
       Instant lastRequestInstant = lightbulbSocketService.getLastSentRequestInstantOrEpoch(lightbulb.getId());
       if (lastRequestInstant.isBefore(lastPollInstant)) {
           lightbulbSocketService.sendLightbulbRequest(lightbulb, LightbulbRequest.getDefaultInstance());
+      }
+    }
+  }
+
+  /**
+   * Checks all lightbulbs for if they have received a response since the last request
+   * and updates is_active accordingly
+   */
+  private void updateActiveStatus() {
+    Collection<Lightbulb> lightbulbs = lightbulbService.getAllLightbulbs();
+    for (Lightbulb lightbulb : lightbulbs) {
+      Instant lastRequest = lightbulbSocketService.getLastSentRequestInstantOrEpoch(lightbulb.getId());
+      Instant lastResponse = lightbulbSocketService.getLastResponseInstantOrEpoch(lightbulb.getId());
+      if(lastResponse.isBefore(lastRequest)) {
+        lightbulbService.updateLightbulb(lightbulb.toBuilder().setIsActive(false).build());
+      } else {
+        lightbulbService.updateLightbulb(lightbulb.toBuilder().setIsActive(true).build());
       }
     }
   }
@@ -95,8 +120,15 @@ public class LightbulbDetectionService {
       DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
       try {
         socket.receive(receivePacket);
-        if(Lightbulbs.isBulbAdvertisement(recvBuf)) {
-          lightbulbService.putLightbulb(Lightbulbs.parseAdvertisement(recvBuf));
+        if (Lightbulbs.isBulbAdvertisement(recvBuf)) {
+          Lightbulb lightbulb = Lightbulbs.parseAdvertisement(recvBuf);
+          if (lightbulbService.hasLightbulb(lightbulb.getId())) {
+            Lightbulb existingLightbulb = lightbulbService.getLightbulb(lightbulb.getId());
+            lightbulbSocketService.sendLightbulbRequest(existingLightbulb,
+                LightbulbMessages.createRestoreRequest(existingLightbulb));
+          } else {
+            lightbulbService.putLightbulb(lightbulb);
+          }
         }
       } catch (IOException e) {
         logger.log(Level.SEVERE, "BroadcastListener crashed with \n" + e.getMessage()

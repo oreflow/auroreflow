@@ -7,16 +7,16 @@ import com.google.inject.Singleton;
 import com.oreflow.auroreflow.proto.AuroreflowProto;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb;
-import com.oreflow.auroreflow.util.LightbulbMessages;
 
 import java.io.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 /**
- * Service to manage Lightbulbs
+ * Service to manage Lightbulbs and their current states
  */
 @Singleton
 public class LightbulbService {
@@ -35,15 +35,8 @@ public class LightbulbService {
    * Adds a new {@link Lightbulb}
    */
   void putLightbulb(Lightbulb lightbulb) throws IOException {
-    final long lightbulbId = lightbulb.getId();
-    if(lightbulbs.containsKey(lightbulbId)) {
-      LightbulbRequest restoreRequest = LightbulbMessages.createRestoreRequest(lightbulbs.get(lightbulbId));
-      updateLightbulbWith(lightbulb, restoreRequest);
-    } else {
-      updateLightbulb(lightbulb);
-    }
+    updateLightbulb(lightbulb);
   }
-
 
   /**
    * Gets a {@link Lightbulb} by Id, or throws exception if it does not exist
@@ -58,41 +51,40 @@ public class LightbulbService {
   /**
    *  Updates the stored {@link Lightbulb} with the information in given {@link LightbulbRequest}
    */
-  public void updateLightbulbWith(Lightbulb lightbulb, LightbulbRequest lightbulbRequest) {
+  void updateLightbulbWith(Lightbulb lightbulb, LightbulbRequest lightbulbRequest) {
+    Lightbulb.Builder updatedLightbulb = lightbulb.toBuilder()
+        .setLastChangeMillis(lightbulbRequest.getRequestTime())
+        .setIsActive(true);
     switch (lightbulbRequest.getRequestTypeCase()) {
       case HSV_REQUEST:
         updateLightbulb(
-            lightbulb.toBuilder()
+            updatedLightbulb
                 .setHue(lightbulbRequest.getHsvRequest().getHue())
                 .setSat(lightbulbRequest.getHsvRequest().getSat())
                 .setBright(lightbulbRequest.getHsvRequest().getBrightness())
                 .setColorMode(Lightbulb.ColorMode.COLOR_MODE)
                 .setPower(AuroreflowProto.Power.ON)
-                .setLastChangeMillis(lightbulbRequest.getRequestTime())
                 .build());
         break;
       case CT_REQUEST:
         updateLightbulb(
-            lightbulb.toBuilder()
+            updatedLightbulb
                 .setCt(lightbulbRequest.getCtRequest().getCt())
                 .setBright(lightbulbRequest.getCtRequest().getBrightness())
                 .setColorMode(Lightbulb.ColorMode.COLOR_TEMPERATURE_MODE)
                 .setPower(AuroreflowProto.Power.ON)
-                .setLastChangeMillis(lightbulbRequest.getRequestTime())
                 .build());
         break;
       case POWER_REQUEST:
         updateLightbulb(
-            lightbulb.toBuilder()
+            updatedLightbulb
                 .setPower(lightbulbRequest.getPowerRequest().getPower())
-                .setLastChangeMillis(lightbulbRequest.getRequestTime())
                 .build());
         break;
       case NAME_REQUEST:
         updateLightbulb(
-            lightbulb.toBuilder()
+            updatedLightbulb
                 .setName(lightbulbRequest.getNameRequest().getName())
-                .setLastChangeMillis(lightbulbRequest.getRequestTime())
                 .build());
         break;
       case REQUESTTYPE_NOT_SET:
@@ -102,21 +94,22 @@ public class LightbulbService {
   }
 
   /**
-   * Updates stored {@link Lightbulb}
+   * Updates stored {@link Lightbulb} and triggers weboscket broadcast about the update
    */
-  public void updateLightbulb(Lightbulb lightbulb) {
+  void updateLightbulb(Lightbulb lightbulb) {
     if(!lightbulbs.containsKey(lightbulb.getId())
         || !lightbulbs.get(lightbulb.getId()).equals(lightbulb)) {
+      logger.log(Level.INFO, String.format("UPDATE ID: %d WITH STATUS: %b", lightbulb.getId(), lightbulb.getIsActive()));
       lightbulbs.put(lightbulb.getId(), lightbulb);
       websocketService.broadcastLightbulbUpdate(lightbulb);
     }
   }
 
   /**
-   * Gets a list of all {@link Lightbulb}s where is_active = true
+   * Updates stored {@link Lightbulb}
    */
-  public ImmutableCollection<Lightbulb> getActiveLightbulbs() {
-    return lightbulbs.values().stream().filter(Lightbulb::getIsActive).collect(ImmutableList.toImmutableList());
+  boolean hasLightbulb(long lightbulbId) {
+    return lightbulbs.containsKey(lightbulbId);
   }
 
   /**
