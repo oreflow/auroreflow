@@ -1,4 +1,3 @@
-import {Observable} from "rxjs";
 export class Lightbulb {
     id: string;
     model: string;
