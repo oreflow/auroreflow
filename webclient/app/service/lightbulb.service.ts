@@ -11,20 +11,23 @@ import {LightbulbRequest} from "../model/lightbulbrequest";
 @Injectable()
 export class LightbulbService {
     private PUT_HEADERS = new Headers({ 'Content-Type': 'application/json' });
-    private lightbulbs: Lightbulb[] = [] ;
+    private lightbulbs: Lightbulb[] = [];
+    private initPromise : Promise<any>;
 
-    constructor(private http: Http) {}
+    constructor(private http: Http) {
+        this.initPromise = this.loadLightbulbList();
+    }
 
     /**
-     * Gets a list of currently active lightbulbs
+     * Triggers a reaload of the list of lightbulbs. Returns a promise containing no data.
+     * Accessing the list of Lightbulbs should always be done using the getListOfLightbulbs
+     * Method
      */
-    getListofLightbulbs(): Lightbulb[] {
-        let promise = this.http
+    loadLightbulbList(): Promise<void> {
+        return this.http
             .get('lightbulb/list')
             .map((res: Response) => res.json() as Lightbulb[])
-            .toPromise();
-        promise.then(data => console.log(data));
-        promise
+            .toPromise()
             .then(lightbulbList => lightbulbList.forEach(lightbulb => this.putLightbulb(lightbulb)))
             .catch((err) => {
                 console.log(err);
@@ -33,7 +36,23 @@ export class LightbulbService {
                 setTimeout(() => {
                     this.putLightbulb(this.createMockLightbulb(13));
                 },2000);
-            });
+
+                this.runMockLightbulbUpdates();
+            })
+            .then(() => null);
+    }
+
+    /**
+     * Gets the initialization promise
+     */
+    getInitPromise(): Promise<void> {
+        return this.initPromise;
+    };
+
+    /**
+     * Gets a list of currently active lightbulbs
+     */
+    getListofLightbulbs(): Lightbulb[] {
         return this.lightbulbs;
     };
 
@@ -152,6 +171,7 @@ export class LightbulbService {
             const existingLightbulb = this.lightbulbs[existingIndex];
             if(!existingLightbulb.lastChangeMillis
                 || existingLightbulb.lastChangeMillis < lightbulb.lastChangeMillis) {
+                console.log("Updating lightbulb", lightbulb)
                 existingLightbulb.power = lightbulb.power;
                 existingLightbulb.bright = lightbulb.bright;
                 existingLightbulb.ct = lightbulb.ct;
@@ -177,14 +197,22 @@ export class LightbulbService {
             ip: "192.168.0.179",
             port: 55443,
             power: "ON",
-            bright: 100,
-            ct: 4000,
-            hue: 150,
+            bright: Math.floor(Math.random()* 100 + 1),
+            ct: Math.floor(Math.random()*3500) + 1700,
+            hue: Math.floor(Math.random()*360),
             sat: 100,
             colorMode: id > 10 ? "COLOR_MODE" : "COLOR_TEMPERATURE_MODE",
             isActive: true,
             name: "what up!" + id,
-            lastChangeMillis: "0"
+            lastChangeMillis: new Date().getTime() + ""
         };
     }
+
+    runMockLightbulbUpdates() {
+        setTimeout(() => {
+            this.putLightbulb(this.createMockLightbulb(18));
+            this.runMockLightbulbUpdates();
+            }, 5000);
+    }
+
 }

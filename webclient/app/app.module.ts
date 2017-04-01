@@ -18,11 +18,14 @@ import { SliderComponent } from "./components/slider/slider.component";
 import { EditableNameComponent } from "./components/editablename/editablename.component";
 import { RenameLightbulbsComponent } from "./components/renamelightbulbs/renamelightbulbs.component";
 import {WebsocketService} from "./service/websocket.service";
+import {MapViewComponent} from "./components/mapview/mapview.component";
+import {ApartmentService} from "./service/apartment.service";
 
 const appRoutes: Routes = [
-  { path: 'singlelightbulb/:id', component: SingleLightbulbComponent },
-  { path: 'renamelightbulbs', component: RenameLightbulbsComponent },
-  { path: '', component: LightbulblistComponent }
+    { path: 'singlelightbulb/:id', component: SingleLightbulbComponent },
+    { path: 'renamelightbulbs', component: RenameLightbulbsComponent },
+    { path: 'map', component: MapViewComponent },
+    { path: '', component: LightbulblistComponent }
 ];
 
 @NgModule({
@@ -38,6 +41,7 @@ const appRoutes: Routes = [
         EditableNameComponent,
         PowerControlComponent,
         SliderComponent,
+        MapViewComponent,
     ],
     imports: [
         BrowserModule,
@@ -48,6 +52,7 @@ const appRoutes: Routes = [
   providers: [
       LightbulbService,
       WebsocketService,
+      ApartmentService,
   ],
   bootstrap: [
       AppComponent,

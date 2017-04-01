@@ -1,6 +1,10 @@
+$color1: cyan;
+$color2: darkcyan;
+$color3: darkblue;
+$top-bar-height: 50px;
 .top-bar {
-  height: 50px;
-  background: linear-gradient(cyan, darkgray);
+  height: $top-bar-height;
+  background: linear-gradient($color1, $color2);
   .nav-bar-button {
     padding: 10px;
     float: left;
@@ -13,9 +17,9 @@
   }
 }
 .app-body {
-    background: linear-gradient(darkgray, gray);
+    background: linear-gradient($color2, $color3);
     font-family: Verdana;
-    height: 100%;
+    height: calc(100% - #{$top-bar-height});
     width: 100%;
   ng-component {
     height: 100%;

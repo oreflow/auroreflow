@@ -1,0 +1,80 @@
+<div class="map-section">
+    <svg viewBox="0 0 600 900">
+        <defs>
+            <radialGradient id="livingroom-light-on">
+                <stop offset="0%" stop-color="yellow"/>
+                <stop offset="100%" stop-color="hsl(30,100%,50%)"/>
+            </radialGradient>
+            <radialGradient id="bedroom-light-on">
+                <stop offset="0%" stop-color="yellow"/>
+                <stop offset="100%" stop-color="hsl(270,100%,50%)"/>
+            </radialGradient>
+            <radialGradient id="kitchen-light-on">
+                <stop offset="0%" stop-color="yellow"/>
+                <stop offset="100%" stop-color="hsl(180,100%,50%)"/>
+            </radialGradient>
+            <radialGradient id="corridor-light-on">
+                <stop offset="0%" stop-color="yellow"/>
+                <stop offset="100%" stop-color="hsl(160,100%,50%)"/>
+            </radialGradient>
+        </defs>
+        <polygon
+                (click)="toggleLivingRoom()"
+                class="living-room"
+                points="0,0 0,500 250,500 275,525 325,500 325,0"
+                [ngClass]="{'on': LIVINGROOM_ON}"
+        ></polygon>
+        <polygon
+                (click)="toggleBedRoom()"
+                class="bed-room"
+                points="325,125 600,125 600,525 350,525 325,500"
+                [ngClass]="{'on': BEDROOM_ON}"
+        ></polygon>
+        <polygon
+                (click)="toggleKitchen()"
+                 class="kitchen"
+                 points="0,500 250,500 275,525 275,700 0,700"
+                [ngClass]="{'on': KITCHEN_ON}"
+        ></polygon>
+        <polygon
+                (click)="toggleCorridor()"
+                class="corridor"
+                points="275,525 325,500 350,525 600,525 600,900 500,900 500,625 275,625"
+                [ngClass]="{'on': CORRIDOR_ON}"
+        ></polygon>
+        <polygon
+                class="wardrobe-1"
+                points="275,625 375,625 375,700 275,700"></polygon>
+        <polygon
+                class="wardrobe-2"
+                points="375,625 500,625 500,700 375,700"></polygon>
+        <polygon
+                class="bathroom"
+                points="275,700 500,700 500,900 275,900"></polygon>
+        <polygon
+                class="balcony"
+                points="325,0 600,0 600,125 325,125"></polygon>
+    </svg>
+</div>
+
+<!--
+<div>
+    <div class="lightbulb-name disable-select">
+        <span *ngIf="!lightbulb.name">{{lightbulb.id}}</span>
+        <span *ngIf="lightbulb.name">{{lightbulb.name}}</span>
+        ({{lightbulb.model}})
+    </div>
+    <div class="hsv-control-wrapper disable-select" *ngIf="lightbulb.colorMode === 'COLOR_MODE'">
+        <hsv-control [id]="lightbulb.id"></hsv-control>
+    </div>
+    <div class="ct-control-wrapper disable-select" *ngIf="lightbulb.colorMode === 'COLOR_TEMPERATURE_MODE'">
+        <ct-control [id]="lightbulb.id"></ct-control>
+    </div>
+    <div>
+        <hsv-ct-toggle [id]="lightbulb.id"></hsv-ct-toggle>
+    </div>
+    <div class="power-control-wrapper">
+        <power-control [id]="lightbulb.id"></power-control>
+    </div>
+</div>
+-->

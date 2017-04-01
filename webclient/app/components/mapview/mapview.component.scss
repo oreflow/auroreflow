@@ -1,0 +1,52 @@
+
+.map-section {
+  height: 100%;
+  width: 100%;
+
+  svg {
+    height: calc(100% - 40px);
+    width: calc(100% - 40px);
+    margin: 20px;
+  }
+}
+
+.living-room, .bed-room, .kitchen, .corridor {
+  stroke: purple;
+  stroke-width: 1;
+}
+.living-room {
+  fill:hsl(30,50%,50%);
+}
+.living-room.on {
+  fill:url(#livingroom-light-on);
+}
+.bed-room {
+  fill:hsl(270,50%,50%);
+}
+.bed-room.on {
+  fill:url(#bedroom-light-on);
+}
+.kitchen {
+  fill:hsl(180,50%,50%);
+}
+.kitchen.on {
+  fill:url(#kitchen-light-on);
+}
+.corridor {
+  fill:hsl(160,50%,50%);
+}
+.corridor.on {
+  fill:url(#corridor-light-on);
+}
+.wardrobe-1 {
+  fill:hsl(60,50%,50%);
+}
+.wardrobe-2 {
+  fill:hsl(150,50%,50%);
+}
+.bathroom {
+  fill:hsl(210,50%,50%);
+}
+.balcony {
+  fill:hsl(240,50%,50%);
+}

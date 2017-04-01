@@ -1,11 +1,13 @@
-import {Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnInit} from '@angular/core';
+import {
+    Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnChanges
+} from '@angular/core';
 
 @Component({
     selector: 'slider',
     template: require('./slider.component.html'),
     styles: [require('./slider.component.scss')],
 })
-export class SliderComponent implements OnInit {
+export class SliderComponent implements OnChanges {
     @Input() background: string;
     @Input() value: number;
     @Input() minValue: number;
@@ -16,10 +18,9 @@ export class SliderComponent implements OnInit {
     @ViewChild('sliderBar') sliderElement: ElementRef;
 
     sliderOffset: string;
-    ngOnInit(): void {
+    ngOnChanges(): void {
         let sliderElementWidth = ((this.sliderElement as any).nativeElement as HTMLDivElement).clientWidth;
         let intervalSize = (this.maxValue - this.minValue + 1);
-        console.log(this.value, intervalSize, this.maxValue, this.minValue);
         this.sliderOffset = ((this.value - this.minValue) / intervalSize) * sliderElementWidth + 'px';
     }
 

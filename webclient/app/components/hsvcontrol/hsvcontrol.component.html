@@ -1,6 +1,6 @@
 <div *ngIf="lightbulb">
     <div class="slider-wrapper">
-        <slider [background]="hueBackground"
+        <slider [background]="HUE_BACKGROUND"
                 [value]="lightbulb.hue"
                 [minValue]="1"
                 [maxValue]="359"
@@ -8,7 +8,7 @@
     </div>
     <div class="slider-margin disable-select">MARGIN</div>
     <div class="slider-wrapper">
-        <slider [background]="satBackground"
+        <slider [background]="SAT_FRAG_1 + lightbulb.hue + SAT_FRAG_2 + lightbulb.hue + SAT_FRAG_3"
                 [value]="lightbulb.sat"
                 [minValue]="1"
                 [maxValue]="100"
@@ -16,7 +16,7 @@
     </div>
     <div class="slider-margin disable-select">MARGIN</div>
     <div class="slider-wrapper">
-        <slider [background]="brightBackground"
+        <slider [background]="BRIGHT_BACKGROUND"
                 [value]="lightbulb.bright"
                 [minValue]="1"
                 [maxValue]="100"
