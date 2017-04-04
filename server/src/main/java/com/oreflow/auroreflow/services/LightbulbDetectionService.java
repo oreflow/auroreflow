@@ -42,13 +42,15 @@ public class LightbulbDetectionService {
   private Instant lastPollInstant;
 
   @Inject
-  public LightbulbDetectionService(LightbulbSocketService lightbulbSocketService, LightbulbService lightbulbService) throws IOException {
+  public LightbulbDetectionService(LightbulbSocketService lightbulbSocketService,
+                                   LightbulbService lightbulbService) throws IOException {
     this.lightbulbSocketService = lightbulbSocketService;
     this.lightbulbService = lightbulbService;
     lastPollInstant = Instant.EPOCH;
     socket = new MulticastSocket(BROADCAST_PORT);
     InetAddress inetAddress = InetAddress.getByName(BROADCAST_ADDRESS);
-    broadcastPacket = new DatagramPacket(BROADCAST_MESSAGE, BROADCAST_MESSAGE.length, inetAddress, BROADCAST_PORT);
+    broadcastPacket = new DatagramPacket(BROADCAST_MESSAGE, BROADCAST_MESSAGE.length,
+        inetAddress, BROADCAST_PORT);
     socket.joinGroup(inetAddress);
 
     Thread broadcastListener = new Thread(this::broadcastListenerImpl);
@@ -78,7 +80,8 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Polls connection status on all active {@link Lightbulb}s that have not been accessed since the last poll.
+   * Polls connection status on all active {@link Lightbulb}s that have not been accessed since
+   * the last poll.
    */
   private void pollStatus() {
     Collection<Lightbulb> activeLightbulbs = lightbulbService.getAllLightbulbs();
@@ -86,9 +89,11 @@ public class LightbulbDetectionService {
       broadcastForLightbulbs();
     }
     for (Lightbulb lightbulb : activeLightbulbs) {
-      Instant lastRequestInstant = lightbulbSocketService.getLastSentRequestInstantOrEpoch(lightbulb.getId());
+      Instant lastRequestInstant =
+          lightbulbSocketService.getLastSentRequestInstantOrEpoch(lightbulb.getId());
       if (lastRequestInstant.isBefore(lastPollInstant)) {
-          lightbulbSocketService.sendLightbulbRequest(lightbulb, LightbulbRequest.getDefaultInstance());
+          lightbulbSocketService.sendLightbulbRequest(lightbulb,
+              LightbulbRequest.getDefaultInstance());
       }
     }
   }
@@ -100,8 +105,10 @@ public class LightbulbDetectionService {
   private void updateActiveStatus() {
     Collection<Lightbulb> lightbulbs = lightbulbService.getAllLightbulbs();
     for (Lightbulb lightbulb : lightbulbs) {
-      Instant lastRequest = lightbulbSocketService.getLastSentRequestInstantOrEpoch(lightbulb.getId());
-      Instant lastResponse = lightbulbSocketService.getLastResponseInstantOrEpoch(lightbulb.getId());
+      Instant lastRequest =
+          lightbulbSocketService.getLastSentRequestInstantOrEpoch(lightbulb.getId());
+      Instant lastResponse =
+          lightbulbSocketService.getLastResponseInstantOrEpoch(lightbulb.getId());
       if(lastResponse.isBefore(lastRequest)) {
         lightbulbService.updateLightbulb(lightbulb.toBuilder().setIsActive(false).build());
       } else {
@@ -143,11 +150,13 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Sends a broadcast message to lightbulbRequest all active lightbulbs on the network to advertise themselves
+   * Sends a broadcast message  {@link LightbulbRequest} all active {@link Lightbulb}s on
+   * the network to advertise themselves
    */
   private void broadcastForLightbulbs(){
     try {
-      logger.log(Level.INFO, "Sending broadcast message to find active lightbulbs to all network interfaces");
+      logger.log(Level.INFO,
+          "Sending broadcast message to find active lightbulbs to all network interfaces");
       Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
       while (interfaces.hasMoreElements()) {
         NetworkInterface networkInterface = interfaces.nextElement();
@@ -158,7 +167,8 @@ public class LightbulbDetectionService {
         socket.send(broadcastPacket);
       }
     } catch (IOException e) {
-      logger.log(Level.SEVERE, String.format("Failed to broadcast for lightbulbs with exception\n%s"), e.getMessage());
+      logger.log(Level.SEVERE,
+          String.format("Failed to broadcast for lightbulbs with exception\n%s"), e.getMessage());
     }
   }
 }
