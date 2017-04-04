@@ -1,19 +1,29 @@
 $color1: cyan;
 $color2: darkcyan;
 $color3: darkblue;
-$top-bar-height: 50px;
+$top-bar-height: 60px;
 .top-bar {
   height: $top-bar-height;
   background: linear-gradient($color1, $color2);
   .nav-bar-button {
-    padding: 10px;
+    padding: 20px;
     float: left;
+    display: table-cell;
+    text-align: center;
+    vertical-align: center;
+    text-decoration: none;
+    font-size: 20px;
+    border-right: 1px solid purple;
+  }
+  .nav-bar-button.active {
+    background: linear-gradient($color2, $color1);
   }
   .poweroff-button {
-    float: right;
-    background-color: red;
+    background: linear-gradient(red, firebrick);
     color: white;
     cursor: pointer;
+    position: absolute;
+    right: 0px;
   }
 }
 .app-body {

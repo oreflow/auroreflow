@@ -34,7 +34,7 @@ export class LightbulbService {
                 this.putLightbulb(this.createMockLightbulb(5));
 
                 setTimeout(() => {
-                    this.putLightbulb(this.createMockLightbulb(13));
+                    this.putLightbulb(this.createMockLightbulb(27));
                 },2000);
 
                 this.runMockLightbulbUpdates();
@@ -185,6 +185,9 @@ export class LightbulbService {
         } else {
             this.lightbulbs.push(lightbulb);
         }
+        // This is really inefficient, but so be it for now
+        this.lightbulbs = this.lightbulbs
+            .sort((bulbA, bulbB) => { return bulbA.name.localeCompare(bulbB.name);});
     }
 
 

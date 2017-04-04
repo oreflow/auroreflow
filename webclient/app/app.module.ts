@@ -7,7 +7,6 @@ import { FormsModule }   from '@angular/forms';
 import { LightbulbService } from './service/lightbulb.service';
 
 import { AppComponent } from './app.component';
-import { SingleLightbulbComponent } from './components/singlelightbulb/singlelightbulb.component';
 import { LightbulblistComponent } from './components/lightbulblist/lightbulblist.component';
 import { ToggleSwitchComponent } from "./components/toggleswitch/toggleswitch.component";
 import { HsvCtToggleComponent } from "./components/hsvcttoggle/hsvcttoggle.component";
@@ -22,16 +21,15 @@ import {MapViewComponent} from "./components/mapview/mapview.component";
 import {ApartmentService} from "./service/apartment.service";
 
 const appRoutes: Routes = [
-    { path: 'singlelightbulb/:id', component: SingleLightbulbComponent },
-    { path: 'renamelightbulbs', component: RenameLightbulbsComponent },
-    { path: 'map', component: MapViewComponent },
+    { path: 'rename', component: RenameLightbulbsComponent },
+    { path: 'apartmentmap', component: MapViewComponent },
+    { path: 'list', component: LightbulblistComponent },
     { path: '', component: LightbulblistComponent }
 ];
 
 @NgModule({
     declarations: [
         AppComponent,
-        SingleLightbulbComponent,
         LightbulblistComponent,
         RenameLightbulbsComponent,
         ToggleSwitchComponent,

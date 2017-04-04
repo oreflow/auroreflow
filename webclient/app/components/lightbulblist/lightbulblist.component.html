@@ -3,7 +3,6 @@
     <div class="lightbulb-name disable-select">
         <span *ngIf="!lightbulb.name">{{lightbulb.id}}</span>
         <span *ngIf="lightbulb.name">{{lightbulb.name}}</span>
-        ({{lightbulb.model}})
     </div>
     <div class="hsv-control-wrapper disable-select" *ngIf="lightbulb.colorMode === 'COLOR_MODE'">
         <hsv-control [id]="lightbulb.id"></hsv-control>
