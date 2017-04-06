@@ -1,5 +1,17 @@
 # Auroreflow
-Lighting controller and UI for Xiaomi Yeelight bulbs
+
+Java backend server and Angular 2 / TypeScript Frontend to 
+control Xiaomi Yeelight lightbulbs on the local network.
+
+### UI
+Currently provides three views 
+
+- List view (Provides a separate HSV/CT control panel per lightbulb active on the network)
+- Apartment view (Customized after the layout of my apartment, providing a simple toggle on/off by clicking rooms on the apartment map.)
+- Names view (Allows the user to rename the lightbulbs)
+
+
+
 
 ### Copyright Notices / Used Frameworks
 
