@@ -1,3 +1,18 @@
+/**
+ * Copyright 2017 Tim Malmström
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.oreflow.auroreflow.services;
 
 import com.google.inject.Inject;
@@ -27,39 +42,8 @@ import java.util.logging.Logger;
 @Singleton
 public class LightbulbSocketService {
 
-  private class ImmutableRequest {
-    Long requestId;
-    Instant requestCreatedTime;
-    Lightbulb lightbulb;
-    LightbulbRequest lightbulbRequest;
-    ImmutableRequest(Lightbulb lightbulb, LightbulbRequest lightbulbRequest) {
-      this.requestId = lastRequestId.getOrDefault(lightbulb.getId(), 1L) + 1;
-      lastRequestId.put(lightbulb.getId(), requestId);
-      this.requestCreatedTime = Instant.now();
-      this.lightbulb = lightbulb;
-      this.lightbulbRequest = lightbulbRequest;
-    }
-
-    Long getRequestId() {
-      return requestId;
-    }
-
-    LightbulbRequest getLightbulbRequest() {
-      return lightbulbRequest;
-    }
-
-    Lightbulb getLightbulb() {
-      return lightbulb;
-    }
-
-    Long getLightbulbId() {
-      return lightbulb.getId();
-    }
-  }
-
   private static final Logger logger = Logger.getLogger(LightbulbSocketService.class.getName());
   private static final Duration MIN_DELAY_BETWEEN_REQUESTS = Duration.ofMillis(300);
-
 
   private final Map<Long, LinkedList<ImmutableRequest>> requests;
   private final Map<Long, Socket> sockets;
@@ -67,8 +51,6 @@ public class LightbulbSocketService {
   private final Map<Long, Instant> lastSentRequestInstant;
   private final Map<Long, Instant> lastResponseInstant;
   private final Map<Long, Long> lastRequestId;
-
-  /** Maps containing threads to throttle requests*/
   private final Map<Long, Thread> pushbackThread;
   private final LightbulbService lightbulbService;
 
@@ -84,13 +66,13 @@ public class LightbulbSocketService {
     lastRequestId = new ConcurrentHashMap<>();
   }
 
-  /** Sends the fiven request to the lightbulb with given lightbulbId */
+  /** Sends the given request to the lightbulb with given lightbulbId. */
   public void sendLightbulbRequest(Long lightbulbId, LightbulbRequest lightbulbRequest) {
     sendLightbulbRequest(lightbulbService.getLightbulb(lightbulbId), lightbulbRequest);
   }
 
 
-  /** Handles throttling for requests and sends a given request to the given lightbulb */
+  /** Send a given {@link LightbulbRequest} to the given {@link Lightbulb}. */
   public void sendLightbulbRequest(Lightbulb lightbulb, LightbulbRequest lightbulbRequest) {
     Instant nextAllowedSendTime = lastSentRequestInstant.getOrDefault(lightbulb.getId(), Instant.EPOCH)
         .plus(MIN_DELAY_BETWEEN_REQUESTS);
@@ -110,7 +92,7 @@ public class LightbulbSocketService {
   }
 
   /**
-   * Sends a {@link ImmutableRequest to its contained lightbulb}
+   * Sends the message of {@link ImmutableRequest} to its lightbulb.
    */
   private void sendRequest(final ImmutableRequest request) throws IOException {
     lastSentRequestInstant.put(request.getLightbulbId(), Instant.now());
@@ -129,7 +111,7 @@ public class LightbulbSocketService {
   }
 
   /**
-   * Gets or creates a new socket for a given lightbulb
+   * Gets or creates a new socket for a given {@link Lightbulb}
    */
   private Socket getSocketForLightbulb(Lightbulb lightbulb) throws IOException {
     if (lastResponseInstant.containsKey(lightbulb.getId())
@@ -193,7 +175,7 @@ public class LightbulbSocketService {
     }
   }
 
-  /** Handles response messages from lightbulbs */
+  /** Handles response messages from {@link Lightbulb}s. */
   private void handleResponse(Lightbulb lightbulb, String message) {
     lastResponseInstant.put(lightbulb.getId(), Instant.now());
     Arrays.stream(message.split("\r\n"))
@@ -209,13 +191,14 @@ public class LightbulbSocketService {
         String.format("Received response message for lightbulb ID: %d\n%s\n", lightbulb.getId(), message));
   }
 
+  /** Handles errors in communicating with a {@link Lightbulb}. */
   private void handleError(ImmutableRequest request) {
     lightbulbService.updateLightbulb(request.getLightbulb().toBuilder().setIsActive(false).build());
   }
 
   /**
-   * Launches a throttling thread for the given lightbulbId which will execute the last request as soon as the
-   * throttling limit is out
+   * Launches a throttling thread for the given lightbulbId which will execute the latest pending request as
+   * soon as the throttling interval allows for it to be sent
    */
   private void launchThrottlingThread(final long lightbulbId, Instant nextAllowedTime) {
     final Duration waitDuration = Duration.between(Instant.now(), nextAllowedTime).plus(Duration.ofMillis(5));
@@ -237,10 +220,12 @@ public class LightbulbSocketService {
     }
   }
 
+  /** Gets the {@link Instant} of the last sent request for a {@link Lightbulb}. */
   Instant getLastSentRequestInstantOrEpoch(Long lightbulbId) {
     return lastSentRequestInstant.getOrDefault(lightbulbId, Instant.EPOCH);
   }
 
+  /** Gets the {@link Instant} of the last received response for a {@link Lightbulb}. */
   Instant getLastResponseInstantOrEpoch(Long lightbulbId) {
     return lastResponseInstant.getOrDefault(lightbulbId, Instant.EPOCH);
   }
@@ -250,7 +235,7 @@ public class LightbulbSocketService {
     return requests.get(lightbulbId).getLast();
   }
 
-  /** Gets a specific requestId and removes all listed requests up until that id*/
+  /** Gets a specific requestId and removes all listed requests up until that id for a {@link Lightbulb}. */
   private Optional<ImmutableRequest> getAndClearBefore(long lightbulbId, long requestId) {
     LinkedList<ImmutableRequest> requestList = requests.get(lightbulbId);
     Optional<ImmutableRequest> request = Optional.empty();
@@ -263,11 +248,45 @@ public class LightbulbSocketService {
     return request;
   }
 
-  /** Adds a request to the back of its lightbulbs requestlist */
+  /** Adds a request to the back of its {@link Lightbulb}s request-list. */
   private void addRequestLast(ImmutableRequest request) {
     if(!requests.containsKey(request.getLightbulbId())) {
       requests.put(request.getLightbulbId(), new LinkedList<>());
     }
     requests.get(request.getLightbulbId()).addLast(request);
+  }
+
+  /**
+   * Class to collect all relevant data for a request during its lifetime
+   * (from creation to response).
+   */
+  private class ImmutableRequest {
+    Long requestId;
+    Instant requestCreatedTime;
+    Lightbulb lightbulb;
+    LightbulbRequest lightbulbRequest;
+    ImmutableRequest(Lightbulb lightbulb, LightbulbRequest lightbulbRequest) {
+      this.requestId = lastRequestId.getOrDefault(lightbulb.getId(), 1L) + 1;
+      lastRequestId.put(lightbulb.getId(), requestId);
+      this.requestCreatedTime = Instant.now();
+      this.lightbulb = lightbulb;
+      this.lightbulbRequest = lightbulbRequest;
+    }
+
+    Long getRequestId() {
+      return requestId;
+    }
+
+    LightbulbRequest getLightbulbRequest() {
+      return lightbulbRequest;
+    }
+
+    Lightbulb getLightbulb() {
+      return lightbulb;
+    }
+
+    Long getLightbulbId() {
+      return lightbulb.getId();
+    }
   }
 }

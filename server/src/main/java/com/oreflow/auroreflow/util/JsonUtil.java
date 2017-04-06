@@ -1,9 +1,22 @@
+/**
+ * Copyright 2017 Tim Malmström
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.oreflow.auroreflow.util;
 
-import com.google.common.io.CharStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
@@ -12,23 +25,22 @@ import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbCommandResponse;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class JsonUtil {
   private static final JsonFormat.Printer protobufJsonPrinter = JsonFormat.printer().includingDefaultValueFields();
   private static final JsonFormat.Parser protobufJsonParser = JsonFormat.parser();
+  private final static Pattern commandResponseMatcher =
+      Pattern.compile("\\{\"id\":[0-9]*, \"result\":\\[\"ok\"\\]\\}");
 
   private static final JsonParser jsonParser = new JsonParser();
   private JsonUtil() {}
 
 
   /**
-   * Creates a JsonArray from a given collection
+   * Creates a JsonArray from a given collection of {@link Object}s.
    */
   public static JsonArray jsonArrayOf(Object... elements) {
     JsonArray jsonArray = new JsonArray();
@@ -60,14 +72,17 @@ public final class JsonUtil {
     return jsonArray;
   }
 
-  private final static Pattern commandResponseMatcher =
-      Pattern.compile("\\{\"id\":[0-9]*, \"result\":\\[\"ok\"\\]\\}");
+
+  /**
+   * Validates whether a message is a {@link com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb}
+   * command response.
+   */
   public static boolean isCommandResponse(String message) {
     return commandResponseMatcher.matcher(message).matches();
   }
 
   /**
-   * Parses a Lighbulb command response from JSON to {@link LightbulbCommandResponse}
+   * Parses a Lighbulb command response from JSON to its requestId
    */
   public static long parseCommandResponseId(String responseMessage) {
     return new JsonParser().parse(responseMessage).getAsJsonObject().get("id").getAsLong();

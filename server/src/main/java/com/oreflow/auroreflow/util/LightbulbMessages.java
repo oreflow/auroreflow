@@ -1,10 +1,25 @@
+/**
+ * Copyright 2017 Tim Malmström
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.oreflow.auroreflow.util;
 
 import com.google.common.base.Verify;
 import com.google.gson.*;
-import com.oreflow.auroreflow.proto.AuroreflowProto;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Power;
 import com.oreflow.auroreflow.proto.AuroreflowProto.PowerRequest;
+import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb;
 import com.oreflow.auroreflow.proto.AuroreflowProto.LightbulbRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.CtRequest;
 import com.oreflow.auroreflow.proto.AuroreflowProto.HsvRequest;
@@ -15,9 +30,15 @@ import java.time.Instant;
 
 import static com.oreflow.auroreflow.util.JsonUtil.jsonArrayOf;
 
+/**
+ * Utility methods for command messages to {@link com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb}s.
+ */
 public final class LightbulbMessages {
   private LightbulbMessages() {}
 
+  /**
+   * Validates the properties of a {@link LightbulbRequest} so that they are within their bounds.
+   */
   public static void validateLightbulbRequest(LightbulbRequest lightbulbRequest) {
     switch (lightbulbRequest.getRequestTypeCase()) {
       case HSV_REQUEST:
@@ -40,6 +61,7 @@ public final class LightbulbMessages {
       default:
     }
   }
+
   /**
    * Creates a Lightbulb-JSON String for the given LightbulbRequest
    */
@@ -142,6 +164,7 @@ public final class LightbulbMessages {
   private static String createSetBright(long id, int brightness, Effect effect, int duration) {
     return createRequestObject(id,"set_bright", jsonArrayOf(brightness, effect.toString(), duration));
   }
+
   /**
    * set_default 0
    */
@@ -214,9 +237,13 @@ public final class LightbulbMessages {
     throw new NotImplementedException();
   }
 
-
   /**
-   * Builds the actual request object with given id, method and params
+   * Builds the a JSON Request string from given id, method and params shaped as
+   * {
+   *   id: @param id,
+   *   method: @param method,
+   *   params: [param0, param1, ..., paramN]
+   * }
    */
   private static String createRequestObject(long id, String method, JsonArray params) {
     JsonObject json = new JsonObject();
@@ -226,7 +253,10 @@ public final class LightbulbMessages {
     return json.toString() + "\r\n";
   }
 
-  public static LightbulbRequest createRestoreRequest(AuroreflowProto.Lightbulb lightbulb) {
+  /**
+   * Takes in a {@link Lightbulb} and creates a {@link LightbulbRequest} to restore its current state.
+   */
+  public static LightbulbRequest createRestoreRequest(Lightbulb lightbulb) {
     if(lightbulb.getPower().equals(Power.OFF)) {
       return LightbulbRequest.newBuilder().setPowerRequest(PowerRequest.newBuilder().setPower(Power.OFF)).build();
     }
@@ -235,8 +265,8 @@ public final class LightbulbMessages {
         return LightbulbRequest.newBuilder()
             .setCtRequest(
                 CtRequest.newBuilder()
-                .setCt(lightbulb.getCt())
-                .setBrightness(lightbulb.getBright()))
+                    .setCt(lightbulb.getCt())
+                    .setBrightness(lightbulb.getBright()))
             .setRequestTime(Instant.now().toEpochMilli())
             .build();
       case COLOR_MODE:
@@ -249,7 +279,6 @@ public final class LightbulbMessages {
             .setRequestTime(Instant.now().toEpochMilli())
             .build();
     }
-    throw new IllegalArgumentException("Cannot restore state of lighbulb with power on and non CT or HSV");
+    throw new IllegalArgumentException("Cannot restore state of lighbulb with power on and non CT or HSV state");
   }
-
 }

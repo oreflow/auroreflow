@@ -1,1 +1,1 @@
-protoc src/main/proto/entities.proto --java_out=src/main/java/com/oreflow/auroreflow/proto
+protoc ${BASH_SOURCE%/*}/src/main/proto/auroreflow.proto --java_out=${BASH_SOURCE%/*}/src/main/java

@@ -1,3 +1,18 @@
+/**
+ * Copyright 2017 Tim Malmström
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.oreflow.auroreflow.services;
 
 import com.google.inject.Inject;
@@ -17,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Service managing broadcasts and listening for announcements of lightbulbs coming active on the network
  */
 @Singleton
 public class LightbulbDetectionService {
@@ -62,7 +77,7 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Endless loop that polls for status every {@literal POLLING_INTERVAL}
+   * Continous thread triggering polling every {@literal POLLING_INTERVAL}
    */
   private void statusPollingThreadImpl() {
     while (true) {
@@ -80,8 +95,8 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Polls connection status on all active {@link Lightbulb}s that have not been accessed since
-   * the last poll.
+   * Polls current power status on all active {@link Lightbulb}s that have not been
+   * accessed since the last poll. Used to detect lightbulbs that have gone offline.
    */
   private void pollStatus() {
     Collection<Lightbulb> activeLightbulbs = lightbulbService.getAllLightbulbs();
@@ -99,8 +114,8 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Checks all lightbulbs for if they have received a response since the last request
-   * and updates is_active accordingly
+   * Checks all {@link Lightbulb}s whether they have returned a response since the last poll
+   * and marks them as active/inactive accordingly.
    */
   private void updateActiveStatus() {
     Collection<Lightbulb> lightbulbs = lightbulbService.getAllLightbulbs();
@@ -118,7 +133,7 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Infinite loop that listens to broadcast messages
+   * Continous listener for lightbulbs announcing themselves on the network
    */
   private void broadcastListenerImpl() {
     logger.log(Level.INFO, "Starting Broadcast listener");
@@ -150,8 +165,7 @@ public class LightbulbDetectionService {
   }
 
   /**
-   * Sends a broadcast message  {@link LightbulbRequest} all active {@link Lightbulb}s on
-   * the network to advertise themselves
+   * Sends a broadcast message to detect all active {@link Lightbulb}s on the network.
    */
   private void broadcastForLightbulbs(){
     try {
