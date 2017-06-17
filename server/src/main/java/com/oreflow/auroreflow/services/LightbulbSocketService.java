@@ -15,6 +15,7 @@
  */
 package com.oreflow.auroreflow.services;
 
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.oreflow.auroreflow.proto.AuroreflowProto.Lightbulb;
@@ -24,14 +25,10 @@ import com.oreflow.auroreflow.util.LightbulbMessages;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,11 +44,15 @@ public class LightbulbSocketService {
 
   private final Map<Long, LinkedList<ImmutableRequest>> requests;
   private final Map<Long, Socket> sockets;
-  private final Map<Long, Thread> socketReaders;
+
+  private final ExecutorService readerService;
+  private final Map<Long, Future<?>> socketReaders;
+  private final ScheduledExecutorService pushbackExecutor;
+  private final Map<Long, Future<?>> pushbackFutures;
+
   private final Map<Long, Instant> lastSentRequestInstant;
   private final Map<Long, Instant> lastResponseInstant;
   private final Map<Long, Long> lastRequestId;
-  private final Map<Long, Thread> pushbackThread;
   private final LightbulbService lightbulbService;
 
   @Inject
@@ -59,10 +60,15 @@ public class LightbulbSocketService {
     this.lightbulbService = lightbulbService;
     sockets = new ConcurrentHashMap<>();
     requests = new ConcurrentHashMap<>();
-    pushbackThread = new ConcurrentHashMap<>();
+
+    readerService = Executors.newFixedThreadPool(20);
+    socketReaders = new ConcurrentHashMap<>();
+
+    pushbackExecutor = Executors.newScheduledThreadPool(20);
+    pushbackFutures = new ConcurrentHashMap<>();
+
     lastSentRequestInstant = new ConcurrentHashMap<>();
     lastResponseInstant = new ConcurrentHashMap<>();
-    socketReaders = new ConcurrentHashMap<>();
     lastRequestId = new ConcurrentHashMap<>();
   }
 
@@ -85,8 +91,7 @@ public class LightbulbSocketService {
     try {
       sendRequest(request);
     } catch (IOException e) {
-      logger.log(Level.SEVERE,
-          String.format("Lightbulb request failed with error %s: %s", e.getClass(), e.getMessage()));
+      logger.log(Level.SEVERE, String.format("REQUEST_FAILED_TO_SEND %d: %s", lightbulb.getId(), e.getMessage()));
       handleError(request);
     }
   }
@@ -117,12 +122,12 @@ public class LightbulbSocketService {
     if (lastResponseInstant.containsKey(lightbulb.getId())
         && lastSentRequestInstant.containsKey(lightbulb.getId())
         && lastResponseInstant.get(lightbulb.getId()).plus(Duration.ofSeconds(20))
-          .isBefore(lastSentRequestInstant.get(lightbulb.getId()))) {
+        .isBefore(lastSentRequestInstant.get(lightbulb.getId()))) {
       disposeSocket(lightbulb);
     }
-    if(sockets.containsKey(lightbulb.getId())) {
+    if (sockets.containsKey(lightbulb.getId())) {
       Socket socket = sockets.get(lightbulb.getId());
-      if(socket.isConnected() && !socket.isClosed()) {
+      if (socket.isConnected() && !socket.isClosed()) {
         return socket;
       }
       disposeSocket(lightbulb);
@@ -136,47 +141,55 @@ public class LightbulbSocketService {
    * continously reads from the created socket
    */
   private Socket createNewSocket(final Lightbulb lightbulb) throws IOException {
+    logger.log(Level.INFO, String.format("NEW SOCKET: %d", lightbulb.getId()));
     final Socket socket = new Socket(lightbulb.getIp(), lightbulb.getPort());
-    Thread socketReader = new Thread(() -> {
+    sockets.put(lightbulb.getId(), socket);
+    runSocketReader(socket, lightbulb);
+    return socket;
+  }
+
+  private void runSocketReader(final Socket socket, final Lightbulb lightbulb) throws IOException {
+    if(socketReaders.containsKey(lightbulb.getId())) {
+      socketReaders.get(lightbulb.getId()).cancel(true);
+    }
+    socketReaders.put(lightbulb.getId(), readerService.submit(() -> {
+      logger.log(Level.INFO, String.format("SOCKET_READER_STARTING: %d", lightbulb.getId()));
       try {
         Reader reader = new InputStreamReader(socket.getInputStream());
         char[] messageBuffer = new char[1024];
         while(socket.isConnected() && !Thread.interrupted()) {
           reader.read(messageBuffer);
           handleResponse(lightbulb, new String(messageBuffer));
-          Thread.sleep(10);
         }
-      } catch (SocketException e) {
-        logger.log(Level.INFO, String.format("Socket for %d closed.", lightbulb.getId()));
+      } catch (Exception e) {
+        logger.log(Level.INFO, String.format("SOCKET_READER_THREW_EXCEPTION: %d.\n%s", lightbulb.getId(), e));
       }
-      catch (InterruptedException|IOException e) {
-        e.printStackTrace();
-        logger.log(Level.SEVERE, String.format("Socket reader for lightbulb %s terminated unexpectedly", lightbulb));
-      }
-    });
-    System.out.println("Launching new reader thread");
-    socketReaders.put(lightbulb.getId(), socketReader);
-    socketReader.start();
-    sockets.put(lightbulb.getId(), socket);
-    return socket;
+      logger.log(Level.INFO, String.format("SOCKET_READER_TERMINATED: %d.", lightbulb.getId()));
+    }));
   }
 
   /** Disposes of an existing socket and its read-thread */
   private void disposeSocket(Lightbulb lightbulb) throws IOException {
-    Socket socket = sockets.get(lightbulb.getId());
-    Thread reader = socketReaders.get(lightbulb.getId());
-    if(reader != null) {
-      reader.interrupt();
-      socketReaders.remove(lightbulb.getId());
-    }
-    if(socket != null) {
-      socket.close();
+    if(sockets.containsKey(lightbulb.getId())) {
+      logger.log(Level.INFO, String.format("DISPOSE_SOCKET: %d", lightbulb.getId()));
+      sockets.get(lightbulb.getId()).close();
       sockets.remove(lightbulb.getId());
     }
   }
 
   /** Handles response messages from {@link Lightbulb}s. */
-  private void handleResponse(Lightbulb lightbulb, String message) {
+  private void handleResponse(Lightbulb lightbulb, String message) throws IOException {
+    logger.log(Level.INFO, String.format("RESPONSE_RECEIVED: %d\n%s", lightbulb.getId(), message));
+    /**
+     * In some cases the lightbulbs doesn't terminate messages, and the reader gets stuck in an endless loop.
+     * This handles that problem by disposing the socket if it receives a message not containing a JSON Object
+     * (missing either { or }).
+     */
+    if(!message.contains("{") || !message.contains("}")) {
+      logger.log(Level.INFO, String.format("INVALID_MESSAGE: %d", lightbulb.getId()));
+      throw new IllegalArgumentException("INVALID_MESSAGE");
+    }
+
     lastResponseInstant.put(lightbulb.getId(), Instant.now());
     Arrays.stream(message.split("\r\n"))
         .filter(JsonUtil::isCommandResponse)
@@ -187,8 +200,7 @@ public class LightbulbSocketService {
               lightbulbService.updateLightbulbWith(
                   immutableRequest.getLightbulb(), immutableRequest.getLightbulbRequest()));
         });
-    logger.log(Level.INFO,
-        String.format("Received response message for lightbulb ID: %d\n%s\n", lightbulb.getId(), message));
+
   }
 
   /** Handles errors in communicating with a {@link Lightbulb}. */
@@ -201,23 +213,19 @@ public class LightbulbSocketService {
    * soon as the throttling interval allows for it to be sent
    */
   private void launchThrottlingThread(final long lightbulbId, Instant nextAllowedTime) {
-    final Duration waitDuration = Duration.between(Instant.now(), nextAllowedTime).plus(Duration.ofMillis(5));
-    if (!pushbackThread.containsKey(lightbulbId)) {
-      Thread pushback = new Thread(() -> {
-        try {
-          System.out.println("Sleeping" + waitDuration.toMillis());
-          Thread.sleep(Math.max(waitDuration.toMillis(), 0));
-          this.sendRequest(getLastRequest(lightbulbId));
-        } catch (InterruptedException e) {
-          logger.log(Level.SEVERE, "Got interrupted while waiting for next allowed lightbulbRequest time");
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        pushbackThread.remove(lightbulbId);
-      });
-      pushbackThread.put(lightbulbId, pushback);
-      pushback.start();
+    if(pushbackFutures.containsKey(lightbulbId) && !pushbackFutures.get(lightbulbId).isDone()) {
+      return;
     }
+    final Duration waitDuration = Duration.between(Instant.now(), nextAllowedTime).plus(Duration.ofMillis(5));
+    pushbackFutures.put(lightbulbId, pushbackExecutor.schedule(() -> {
+      try {
+        logger.log(Level.INFO, String.format("REQUEST_THROTTLED: %d", lightbulbId));
+        sendRequest(getLastRequest(lightbulbId));
+      } catch (Exception e) {
+        logger.log(Level.SEVERE, "THROTTLING_THREAD_EXCEPTION: %d", lightbulbId);
+        throw new UncheckedExecutionException(e);
+      }
+    }, waitDuration.toMillis(), TimeUnit.MILLISECONDS));
   }
 
   /** Gets the {@link Instant} of the last sent request for a {@link Lightbulb}. */

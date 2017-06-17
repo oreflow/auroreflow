@@ -28,6 +28,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,8 +42,9 @@ import java.util.logging.Logger;
 public class LightbulbDetectionService {
   private static final Logger logger = Logger.getLogger(LightbulbDetectionService.class.getName());
 
+  private static final Duration BROADCAST_SCAN_INTERVAL = Duration.ofMinutes(15);
   private static final Duration POLLING_INTERVAL = Duration.ofSeconds(30);
-  private static final Duration ALLOWED_DELAY = Duration.ofSeconds(5);
+  private static final Duration ALLOWED_RESPONSE_DELAY = Duration.ofSeconds(5);
 
   private static final int BROADCAST_PORT = 1982;
   private static final String BROADCAST_ADDRESS = "239.255.255.250";
@@ -54,43 +59,38 @@ public class LightbulbDetectionService {
   private final LightbulbSocketService lightbulbSocketService;
   private final LightbulbService lightbulbService;
 
-  private Instant lastPollInstant;
+  private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+  private final ExecutorService broadcastListenerService = Executors.newSingleThreadExecutor();
+
+  private Instant lastPollInstant = Instant.EPOCH;
+  private Instant lastBroadcastInstant = Instant.EPOCH;
 
   @Inject
   public LightbulbDetectionService(LightbulbSocketService lightbulbSocketService,
                                    LightbulbService lightbulbService) throws IOException {
     this.lightbulbSocketService = lightbulbSocketService;
     this.lightbulbService = lightbulbService;
-    lastPollInstant = Instant.EPOCH;
     socket = new MulticastSocket(BROADCAST_PORT);
     InetAddress inetAddress = InetAddress.getByName(BROADCAST_ADDRESS);
     broadcastPacket = new DatagramPacket(BROADCAST_MESSAGE, BROADCAST_MESSAGE.length,
         inetAddress, BROADCAST_PORT);
     socket.joinGroup(inetAddress);
 
-    Thread broadcastListener = new Thread(this::broadcastListenerImpl);
-    broadcastListener.start();
-    broadcastForLightbulbs();
-
-    Thread statusPollingThread = new Thread(this::statusPollingThreadImpl);
-    statusPollingThread.start();
+    broadcastListenerService.submit(this::broadcastListenerImpl);
+    scheduledExecutor.scheduleAtFixedRate(this::updateActive, 0, POLLING_INTERVAL.minus(ALLOWED_RESPONSE_DELAY).toMillis(), TimeUnit.MILLISECONDS);
+    scheduledExecutor.scheduleAtFixedRate(this::broadcastForLightbulbs, 0, BROADCAST_SCAN_INTERVAL.toMillis(), TimeUnit.MILLISECONDS);
   }
 
   /**
-   * Continous thread triggering polling every {@literal POLLING_INTERVAL}
+   * Triggers a poll for all connected lightbulbs and updates their active-status.
    */
-  private void statusPollingThreadImpl() {
-    while (true) {
-      try {
-        Thread.sleep(POLLING_INTERVAL.minus(ALLOWED_DELAY).toMillis());
-        pollStatus();
-        lastPollInstant = Instant.now();
-        Thread.sleep(ALLOWED_DELAY.toMillis());
-        updateActiveStatus();
-      } catch (InterruptedException e) {
-        logger.log(Level.SEVERE, "Bulb status polling thread got interrupted");
-        return;
-      }
+  private void updateActive() {
+    try {
+      pollStatus();
+      Thread.sleep(ALLOWED_RESPONSE_DELAY.toMillis());
+      updateActiveStatus();
+    } catch (InterruptedException e) {
+      logger.log(Level.SEVERE, "Bulb active status check got interrupted");
     }
   }
 
@@ -100,7 +100,8 @@ public class LightbulbDetectionService {
    */
   private void pollStatus() {
     Collection<Lightbulb> activeLightbulbs = lightbulbService.getAllLightbulbs();
-    if(activeLightbulbs.isEmpty()) {
+    if(activeLightbulbs.isEmpty()
+        || lastBroadcastInstant.plus(BROADCAST_SCAN_INTERVAL).isBefore(Instant.now())) {
       broadcastForLightbulbs();
     }
     for (Lightbulb lightbulb : activeLightbulbs) {
@@ -111,6 +112,7 @@ public class LightbulbDetectionService {
               LightbulbRequest.getDefaultInstance());
       }
     }
+    lastPollInstant = Instant.now();
   }
 
   /**
@@ -171,6 +173,7 @@ public class LightbulbDetectionService {
     try {
       logger.log(Level.INFO,
           "Sending broadcast message to find active lightbulbs to all network interfaces");
+      lastBroadcastInstant = Instant.now();
       Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
       while (interfaces.hasMoreElements()) {
         NetworkInterface networkInterface = interfaces.nextElement();
