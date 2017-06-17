@@ -22,15 +22,9 @@ import {LightbulbService} from "../../service/lightbulb.service";
     template: require('./hsvcontrol.component.html'),
     styles: [require('./hsvcontrol.component.scss')],
 })
-export class HsvControlComponent implements OnInit, OnChanges {
-    ngOnChanges(changes: SimpleChanges): void {
-        console.log('CHANGES!!!');
-    }
+export class HsvControlComponent implements OnInit {
     @Input() id: string;
     private lightbulb: Lightbulb;
-    private HUE_REGEX = /\$hue/g;
-    private SAT_REGEX = /\$sat/g;
-    private BRIGHT_REGEX = /\$bright/g;
     private HUE_BACKGROUND = '-webkit-linear-gradient(left, #FF0000, #FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000)';
 
 

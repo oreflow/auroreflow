@@ -11,6 +11,11 @@ export class AppComponent implements OnInit{
     constructor(private lightbulbService: LightbulbService,
                 private websocketService: WebsocketService) {}
     ngOnInit(): void {
+        window.onfocus = () => {
+            console.log('reiniting')
+            this.websocketService.connectToSocket();
+            this.lightbulbService.loadLightbulbList();
+        };
     }
 
     powerOffAll() {

@@ -1,0 +1,94 @@
+/**
+ * Copyright 2017 Tim Malmström
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.lightbulb-block {
+  float: left;
+  width: auto;
+  padding: 10px;
+  border: 1px solid purple;
+  border-radius: 5px;
+  margin: 10px;
+  & > div {
+    display: inline-block;
+  }
+}
+.lightbulb-name {
+  font-size: 24px;
+  padding: 10px;
+  overflow: hidden;
+  color: white;
+  cursor: default;
+}
+.power-control-wrapper {
+  float: right;
+}
+
+.lightbulb-selector > input {
+  margin: 0;
+  border: 0;
+  -webkit-appearance: none;
+  height: 50px;
+  width: 50px;
+  background: linear-gradient(black, darkred);
+  border-radius: 5px;
+  &:checked {
+    color: white;
+    background: linear-gradient(green, darkgreen);
+  }
+  &:checked:before {
+    font-family: "Material Icons";
+    content: 'check';
+    font-size: 50px;
+  }
+}
+
+.controls {
+  clear: both;
+  padding: 50px;
+  .control-wrapper {
+    .slider-wrapper {
+      height: 50px;
+      float: left;
+      margin-right: 20px;
+      width: 300px;
+    }
+  }
+  .control-wrapper {
+    .slider-wrapper {
+      height: 50px;
+      float: left;
+      margin-right: 20px;
+      width: 300px;
+    }
+  }
+  .mode-toggle {
+    padding-top: 20px;
+    clear: both;
+    text-align: center;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    .toggle-label {
+      vertical-align: middle;
+      display: table-cell;
+      color: white;
+      font-size: 24px;
+    }
+    toggle-switch {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  }
+}

@@ -17,48 +17,78 @@ import { Component, OnInit } from '@angular/core';
 
 import { LightbulbService } from '../../service/lightbulb.service';
 import {ApartmentService} from "../../service/apartment.service";
+import {Lightbulb} from "../../model/lightbulb";
+
+enum ToggleAble {
+    LIVINGROOM = 1,
+    BEDROOM = 2,
+    LIVINGROOM_RIGHT = 3,
+    LIVINGROOM_LEFT = 4,
+    KITCHEN = 5,
+    ENTRANCE = 6,
+    HALLWAY = 7,
+    BATHROOM = 8
+}
 
 @Component({
   template: require('./mapview.component.html'),
   styles: [require('./mapview.component.scss')],
 })
-export class MapViewComponent implements OnInit{
+export class MapViewComponent implements OnInit {
+    private ToggleAble = ToggleAble;
 
     private ON_CT = 3000;
     private ON_BRIGHTNESS = 40;
     private OFF_POWER = 'OFF';
 
-    private LIVINGROOM_BULB_IDS: string[];
-    private BEDROOM_BULB_IDS: string[];
-    private KITCHEN_BULB_IDS: string[];
-    private CORRIDOR_BULB_IDS: string[];
+    private LIVINGROOM_BULB_IDS = [
+        ApartmentService.LIVINGROOM_ROOF_BULB_ID_1,
+        ApartmentService.LIVINGROOM_ROOF_BULB_ID_2
+    ];
+    private BEDROOM_BULB_IDS = [
+        ApartmentService.BEDROOM_ROOF_BULB_ID_1,
+        ApartmentService.BEDROOM_ROOF_BULB_ID_2
+    ];
 
-    private LIVINGROOM_ON: boolean;
-    private BEDROOM_ON: boolean;
-    private KITCHEN_ON: boolean;
-    private CORRIDOR_ON: boolean;
+    private powerStatus: {[key: number]: boolean} = {};
 
-    constructor(private lightbulbService: LightbulbService,
-                private apartmentService: ApartmentService) {
-        this.LIVINGROOM_BULB_IDS = apartmentService.getLivingroomBulbIds();
-        this.BEDROOM_BULB_IDS = apartmentService.getBedroomBulbIds();
-        this.KITCHEN_BULB_IDS = apartmentService.getKitchenBulbIds();
-        this.CORRIDOR_BULB_IDS = apartmentService.getCorridorBulbIds();
+
+    constructor(private lightbulbService: LightbulbService) {
         this.lightbulbService.getInitPromise().then(() => {
             const lightbulbs = this.lightbulbService.getListofLightbulbs();
             if(lightbulbs.length > 0) {
-                this.LIVINGROOM_ON = !!lightbulbs
-                    .find(lightbulb => this.LIVINGROOM_BULB_IDS.indexOf(lightbulb.id) >= 0
-                    && lightbulb.power === 'ON');
-                this.BEDROOM_ON = !!lightbulbs
-                    .find(lightbulb => this.BEDROOM_BULB_IDS.indexOf(lightbulb.id) >= 0
-                    && lightbulb.power === 'ON');
-                this.KITCHEN_ON = !!lightbulbs
-                    .find(lightbulb => this.KITCHEN_BULB_IDS.indexOf(lightbulb.id) >= 0
-                    && lightbulb.power === 'ON');
-                this.CORRIDOR_ON = !!lightbulbs
-                    .find(lightbulb => this.CORRIDOR_BULB_IDS.indexOf(lightbulb.id) >= 0
-                    && lightbulb.power === 'ON');
+                lightbulbs.forEach((lightbulb: Lightbulb) => {
+                    if(lightbulb.power === 'ON') {
+                        switch (lightbulb.id) {
+                            case ApartmentService.LIVINGROOM_RIGHT_BULB_ID:
+                                this.powerStatus[ToggleAble.LIVINGROOM_RIGHT] = true;
+                                break;
+                            case ApartmentService.LIVINGROOM_LEFT_BULB_ID:
+                                this.powerStatus[ToggleAble.LIVINGROOM_LEFT] = true;
+                                break;
+                            case ApartmentService.LIVINGROOM_ROOF_BULB_ID_1:
+                            case ApartmentService.LIVINGROOM_ROOF_BULB_ID_2:
+                                this.powerStatus[ToggleAble.LIVINGROOM] = true;
+                                break;
+                            case ApartmentService.BEDROOM_ROOF_BULB_ID_1:
+                            case ApartmentService.BEDROOM_ROOF_BULB_ID_2:
+                                this.powerStatus[ToggleAble.BEDROOM] = true;
+                                break;
+                            case ApartmentService.KITCHEN_BULB_ID:
+                                this.powerStatus[ToggleAble.KITCHEN] = true;
+                                return;
+                            case ApartmentService.ENTRANCE_BULB_ID:
+                                this.powerStatus[ToggleAble.ENTRANCE] = true;
+                                return;
+                            case ApartmentService.HALLWAY_BULB_ID:
+                                this.powerStatus[ToggleAble.HALLWAY] = true;
+                                return;
+                            case ApartmentService.BATHROOM_BULB_ID:
+                                this.powerStatus[ToggleAble.BATHROOM] = true;
+                                return;
+                        }
+                    }
+                });
             }
         });
     }
@@ -66,22 +96,36 @@ export class MapViewComponent implements OnInit{
     ngOnInit(): void {
     }
 
-    toggleLivingRoom() {
-        this.LIVINGROOM_ON = !this.LIVINGROOM_ON;
-        this.sendUpdatesTo(this.LIVINGROOM_BULB_IDS, this.LIVINGROOM_ON);
+    toggle(entity: ToggleAble) {
+        this.powerStatus[entity] = !this.powerStatus[entity];
+        switch (entity) {
+            case ToggleAble.LIVINGROOM:
+                this.sendUpdatesTo(this.LIVINGROOM_BULB_IDS, this.powerStatus[entity]);
+                break;
+            case ToggleAble.BEDROOM:
+                this.sendUpdatesTo(this.BEDROOM_BULB_IDS, this.powerStatus[entity]);
+                break;
+            case ToggleAble.LIVINGROOM_RIGHT:
+                this.sendUpdatesTo([ApartmentService.LIVINGROOM_RIGHT_BULB_ID], this.powerStatus[entity]);
+                break;
+            case ToggleAble.LIVINGROOM_LEFT:
+                this.sendUpdatesTo([ApartmentService.LIVINGROOM_LEFT_BULB_ID], this.powerStatus[entity]);
+                break;
+            case ToggleAble.KITCHEN:
+                this.sendUpdatesTo([ApartmentService.KITCHEN_BULB_ID], this.powerStatus[entity]);
+                break;
+            case ToggleAble.ENTRANCE:
+                this.sendUpdatesTo([ApartmentService.ENTRANCE_BULB_ID], this.powerStatus[entity]);
+                break;
+            case ToggleAble.HALLWAY:
+                this.sendUpdatesTo([ApartmentService.HALLWAY_BULB_ID], this.powerStatus[entity]);
+                break;
+            case ToggleAble.BATHROOM:
+                this.sendUpdatesTo([ApartmentService.BATHROOM_BULB_ID], this.powerStatus[entity]);
+                break;
+        }
     }
-    toggleBedRoom() {
-        this.BEDROOM_ON = !this.BEDROOM_ON;
-        this.sendUpdatesTo(this.BEDROOM_BULB_IDS, this.BEDROOM_ON);
-    }
-    toggleKitchen() {
-        this.KITCHEN_ON = !this.KITCHEN_ON;
-        this.sendUpdatesTo(this.KITCHEN_BULB_IDS, this.KITCHEN_ON);
-    }
-    toggleCorridor() {
-        this.CORRIDOR_ON = !this.CORRIDOR_ON;
-        this.sendUpdatesTo(this.CORRIDOR_BULB_IDS, this.CORRIDOR_ON);
-    }
+
 
     sendUpdatesTo(ids: string[], on: boolean) {
         this.lightbulbService.getListofLightbulbs()

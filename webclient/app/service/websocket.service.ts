@@ -28,6 +28,10 @@ export class WebsocketService {
     private lightbulbUpdateSocket: WebSocket;
 
     constructor(private lightbulbService: LightbulbService) {
+        this.connectToSocket();
+    }
+
+    connectToSocket() {
         this.lightbulbUpdateSocket = new WebSocket("ws://" + window.location.host + "/lightbulbupdates");
         this.lightbulbUpdateSocket.onmessage = (event) => { this.handleLightbulbUpdate(event); };
     }

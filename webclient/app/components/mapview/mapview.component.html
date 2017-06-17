@@ -14,60 +14,152 @@
  limitations under the License.
  -->
 <div class="map-section">
-    <svg viewBox="0 0 600 900">
+    <svg viewBox="0 0 635 945">
         <defs>
-            <radialGradient id="livingroom-light-on">
+            <radialGradient id="shine-effect">
                 <stop offset="0%" stop-color="yellow"/>
-                <stop offset="100%" stop-color="hsl(30,100%,50%)"/>
+                <stop offset="20%" stop-color="yellow"/>
+                <stop offset="70%" stop-color="hsla(60,100%,50%, 0.5)"/>
+                <stop offset="100%" stop-color="hsla(60,100%,50%, 0)"/>
             </radialGradient>
-            <radialGradient id="bedroom-light-on">
-                <stop offset="0%" stop-color="yellow"/>
-                <stop offset="100%" stop-color="hsl(270,100%,50%)"/>
-            </radialGradient>
-            <radialGradient id="kitchen-light-on">
-                <stop offset="0%" stop-color="yellow"/>
-                <stop offset="100%" stop-color="hsl(180,100%,50%)"/>
-            </radialGradient>
-            <radialGradient id="corridor-light-on">
-                <stop offset="0%" stop-color="yellow"/>
-                <stop offset="100%" stop-color="hsl(160,100%,50%)"/>
-            </radialGradient>
+
+            <g id="toggleable-lightbulb-svg-on">
+                <circle r="180" style="fill:url(#shine-effect);" />
+            </g>
+            <g id="toggleable-lightbulb-svg-off">
+                <circle r="180" style="fill:transparent; stroke: darkgray; stroke-width: 1px;" />
+            </g>
+
+            <g id="window">
+                <rect class="window-rect" x="0" y="-8" width="100" height="8"/>
+                <rect class="window-rect" x="0" y="0" width="100" height="8"/>
+            </g>
+
+            <g id="door">
+                <rect class="door-frame" x="0" y="-8" width="80" height="16"/>
+                <line class="door-door" x1="0" y1="0" x2="77" y2="21" width="80"/>
+                <path d="M 0 0 L 80 0 A 80 80 0 0 1 77 21" stroke="black" stroke-width"1px"  fill="transparent"/>
+            </g>
         </defs>
-        <polygon
-                (click)="toggleLivingRoom()"
-                class="living-room"
-                points="0,0 0,500 250,500 275,525 325,500 325,0"
-                [ngClass]="{'on': LIVINGROOM_ON}"
-        ></polygon>
-        <polygon
-                (click)="toggleBedRoom()"
-                class="bed-room"
-                points="325,125 600,125 600,525 350,525 325,500"
-                [ngClass]="{'on': BEDROOM_ON}"
-        ></polygon>
-        <polygon
-                (click)="toggleKitchen()"
-                 class="kitchen"
-                 points="0,500 250,500 275,525 275,700 0,700"
-                [ngClass]="{'on': KITCHEN_ON}"
-        ></polygon>
-        <polygon
-                (click)="toggleCorridor()"
-                class="corridor"
-                points="275,525 325,500 350,525 600,525 600,900 500,900 500,625 275,625"
-                [ngClass]="{'on': CORRIDOR_ON}"
-        ></polygon>
-        <polygon
-                class="wardrobe-1"
-                points="275,625 375,625 375,700 275,700"></polygon>
-        <polygon
-                class="wardrobe-2"
-                points="375,625 500,625 500,700 375,700"></polygon>
-        <polygon
-                class="bathroom"
-                points="275,700 500,700 500,900 275,900"></polygon>
-        <polygon
-                class="balcony"
-                points="325,0 600,0 600,125 325,125"></polygon>
+
+        <polygon class="room livingroom" points="10,10 390,10 390,90 350,90 350,500 290,545 240,515 10,515"></polygon>
+        <polygon class="room bedroom" points="350,130 390,130 390,90 625,90 625,515 375,515 350,500"></polygon>
+        <polygon class="room kitchen" points="10,515 240,515 290,545 300,551 300,690 10,690"></polygon>
+        <polygon class="room corridor" points="350,500 375,515 625,515 625,935 525,935 525,615 300,615 300,551 290,545"></polygon>
+        <polygon class="room wardrobe1" points="325,615 425,615 425,695 325,695"></polygon>
+        <polygon class="room wardrobe2" points="425,615 525,615 525,695 425,695"></polygon>
+        <polygon class="room bathroom" points="350,695 525,695 525,910 420,910 420,840 310,840 310,770 350,770"></polygon>
+        <polygon class="balcony" points="396,0 633,0 633,84 396,84"></polygon>
+
+        <!-- Livingroom window and door -->
+        <use href="#window" class="livingroom-window" transform="translate(90, 10) scale(0.6, 1)"/>
+        <use href="#window" class="livingroom-window" transform="translate(150, 10) scale(1.2, 1)"/>
+        <use href="#door" class="livingroom-window" transform="translate(390, 10) rotate(90) scale(-1, 1) translate(-80, 0)"/>
+
+        <!-- Opening to kitchen -->
+        <line x1="90" y1="515" x2="210" y2="515" stroke="#FFFFFF" stroke-width="20" fill="white"/>
+
+        <!-- Livingroom - Corridor-->
+        <use href="#door" class="livingroom-corridoor-door"transform="translate(355, 495) rotate(142) scale(-1, 1) translate(-80, 0)"/>
+
+        <!-- Bedroom window -->
+        <use href="#window" class="bedroom-window" transform="translate(400, 90) scale(1.2, 1)"/>
+        <use href="#door" class="bedroom-balcony-door" transform="translate(520, 90)"/>
+        <use href="#door" class="bedroom-door" transform="translate(605, 515) rotate(180)"/>
+
+        <!-- Wardrobe doors -->
+        <use href="#door" class="wardrobe1-door" transform="translate(335, 615) scale(0.75, -1)"/>
+        <use href="#door" class="wardrobe2-door" transform="translate(440, 615) scale(0.75, -1)"/>
+
+        <!-- Bathroom door -->
+        <use href="#door" class="bathroom-door" transform="translate(525, 800) rotate(90)"/>
+
+        <!-- Entrance door-->
+        <use href="#door" class="entrance-door" transform="translate(615, 935) rotate(180)"/>
+
+
+        <!-- Lights -->
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.LIVINGROOM]"
+             class="livingroom-roof"
+             (click)="toggle(ToggleAble.LIVINGROOM)"
+             x="175" y="250"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             class="livingroom-roof"
+             *ngIf="!powerStatus[ToggleAble.LIVINGROOM]"
+             (click)="toggle(ToggleAble.LIVINGROOM)"
+             x="175" y="250"/>
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.LIVINGROOM_RIGHT]"
+             class="livingroom-right"
+             (click)="toggle(ToggleAble.LIVINGROOM_RIGHT)"
+             x="10" y="110"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             *ngIf="!powerStatus[ToggleAble.LIVINGROOM_RIGHT]"
+             class="livingroom-right"
+             (click)="toggle(ToggleAble.LIVINGROOM_RIGHT)"
+             x="10" y="110"/>
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.LIVINGROOM_LEFT]"
+             class="livingroom-left"
+             (click)="toggle(ToggleAble.LIVINGROOM_LEFT)"
+             x="10" y="350"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             *ngIf="!powerStatus[ToggleAble.LIVINGROOM_LEFT]"
+             class="livingroom-left"
+             (click)="toggle(ToggleAble.LIVINGROOM_LEFT)"
+             x="10" y="350"/>
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.BEDROOM]"
+             class="bedroom-roof"
+             (click)="toggle(ToggleAble.BEDROOM)"
+             x="487.5" y="322.5"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             *ngIf="!powerStatus[ToggleAble.BEDROOM]"
+             class="bedroom-roof"
+             (click)="toggle(ToggleAble.BEDROOM)"
+             x="487.5" y="322.5"/>
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.KITCHEN]"
+             class="kitchen-roof"
+             (click)="toggle(ToggleAble.KITCHEN)"
+             x="155" y="600"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             *ngIf="!powerStatus[ToggleAble.KITCHEN]"
+             class="kitchen-roof"
+             (click)="toggle(ToggleAble.KITCHEN)"
+             x="155" y="600"/>
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.HALLWAY]"
+             class="hallway"
+             (click)="toggle(ToggleAble.HALLWAY)"
+             x="450" y="565"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             class="hallway"
+             *ngIf="!powerStatus[ToggleAble.HALLWAY]"
+             (click)="toggle(ToggleAble.HALLWAY)"
+             x="450" y="565"/>
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.ENTRANCE]"
+             class="entrance"
+             (click)="toggle(ToggleAble.ENTRANCE)"
+             x="575" y="780"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             *ngIf="!powerStatus[ToggleAble.ENTRANCE]"
+             class="entrance"
+             (click)="toggle(ToggleAble.ENTRANCE)"
+             x="575" y="780"/>
+
+        <use href="#toggleable-lightbulb-svg-on"
+             *ngIf="powerStatus[ToggleAble.BATHROOM]"
+             class="bathroom"
+             (click)="toggle(ToggleAble.BATHROOM)"
+             x="375" y="780"/>
+        <use href="#toggleable-lightbulb-svg-off"
+             *ngIf="!powerStatus[ToggleAble.BATHROOM]"
+             class="bathroom"
+             (click)="toggle(ToggleAble.BATHROOM)"
+             x="375" y="780"/>
+
     </svg>
 </div>

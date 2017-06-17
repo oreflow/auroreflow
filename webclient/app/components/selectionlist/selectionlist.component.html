@@ -1,0 +1,76 @@
+<!--
+ Copyright 2017 Tim Malmström
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -->
+<div class="lightbulbs-container">
+    <div *ngFor="let lightbulb of lightbulbs" class="lightbulb-block">
+        <div class="lightbulb-selector">
+            <input type="checkbox" (click)="selectionChange(lightbulb)">
+        </div>
+        <div class="lightbulb-name disable-select">
+            <span *ngIf="!lightbulb.name">{{lightbulb.id}}</span>
+            <span *ngIf="lightbulb.name">{{lightbulb.name}}</span>
+        </div>
+        <div></div>
+        <div class="power-control-wrapper">
+            <power-control [id]="lightbulb.id"></power-control>
+        </div>
+    </div>
+</div>
+<div class="controls">
+    <div class="control-wrapper">
+        <div class="slider-wrapper" *ngIf="current.colorMode === 'COLOR_TEMPERATURE_MODE'">
+            <slider [background]="CT_BACKGROUND"
+                    [value]="current.ct"
+                    [minValue]="1700"
+                    [maxValue]="6500"
+                    (onValueChange)="ctChange($event)"></slider>
+        </div>
+        <div class="slider-wrapper" *ngIf="current.colorMode === 'COLOR_MODE'">
+            <slider [background]="HUE_BACKGROUND"
+                    [value]="current.hue"
+                    [minValue]="1"
+                    [maxValue]="359"
+                    (onValueChange)="hueChange($event)"></slider>
+        </div>
+        <div class="slider-wrapper"  *ngIf="current.colorMode === 'COLOR_MODE'">
+            <slider [background]="SAT_FRAG_1 + current.hue + SAT_FRAG_2 + current.hue + SAT_FRAG_3"
+                    [value]="current.sat"
+                    [minValue]="1"
+                    [maxValue]="100"
+                    (onValueChange)="satChange($event)"></slider>
+        </div>
+        <div class="slider-wrapper">
+            <slider [background]="BRIGHT_BACKGROUND"
+                    [value]="current.bright"
+                    [minValue]="1"
+                    [maxValue]="100"
+                    (onValueChange)="brightChange($event)"></slider>
+        </div>
+    </div>
+    <div class="mode-toggle">
+        <div class="toggle-label disable-select">TEMP</div>
+        <toggle-switch
+                [toggled]="current.mode == 'COLOR_MODE'"
+                (onToggled)="toggleMode($event)"
+        ></toggle-switch>
+        <div class="toggle-label disable-select">COLOR</div>
+    </div>
+    <div>
+        <hsv-ct-toggle [id]="0"></hsv-ct-toggle>
+    </div>
+    <div class="power-control-wrapper">
+        <power-control [id]="0"></power-control>
+    </div>
+</div>

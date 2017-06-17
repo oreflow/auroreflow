@@ -34,12 +34,14 @@ import { RenameLightbulbsComponent } from "./components/renamelightbulbs/renamel
 import {WebsocketService} from "./service/websocket.service";
 import {MapViewComponent} from "./components/mapview/mapview.component";
 import {ApartmentService} from "./service/apartment.service";
+import {SelectionlistComponent} from "./components/selectionlist/selectionlist.component";
 
 const appRoutes: Routes = [
     { path: 'rename', component: RenameLightbulbsComponent },
     { path: 'apartmentmap', component: MapViewComponent },
     { path: 'list', component: LightbulblistComponent },
-    { path: '', component: LightbulblistComponent }
+    { path: 'selectionlist', component: SelectionlistComponent },
+    { path: '', redirectTo: '/list', pathMatch: 'full'}
 ];
 
 @NgModule({
@@ -55,6 +57,7 @@ const appRoutes: Routes = [
         PowerControlComponent,
         SliderComponent,
         MapViewComponent,
+        SelectionlistComponent,
     ],
     imports: [
         BrowserModule,

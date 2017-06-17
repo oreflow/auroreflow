@@ -45,8 +45,10 @@ export class LightbulbService {
             .toPromise()
             .then(lightbulbList => lightbulbList.forEach(lightbulb => this.putLightbulb(lightbulb)))
             .catch((err) => {
-                console.log(err);
                 this.putLightbulb(this.createMockLightbulb(5));
+                let tmp = this.createMockLightbulb(3)
+                    tmp.isActive = false;
+                this.putLightbulb(tmp);
 
                 setTimeout(() => {
                     this.putLightbulb(this.createMockLightbulb(27));

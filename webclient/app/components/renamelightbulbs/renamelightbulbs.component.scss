@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 .lightbulb-row {
-  float: left;
   clear: both;
   padding: 15px;
   border: 1px solid purple;
+  & > div {
+    display: inline-block;
+  }
+  font-size: 24px;
+  width: 100%;
+  overflow: hidden;
+  color: white;
+  cursor: default;
 }
-.lightbulb-row > div {
-  float: left;
+.power-control-wrapper {
+  float: right;
+  margin-right: 40px;
 }
-.lightbulb-name {
-  min-width: 200px;
-  padding: 10px;
+.lightbulb-id {
+  width: 10%;
+}
+.lightbulb-model {
+  width: 15%;
 }

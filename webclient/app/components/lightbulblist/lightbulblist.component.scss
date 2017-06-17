@@ -17,6 +17,7 @@
   clear: both;
   padding: 15px;
   border: 1px solid purple;
+  position: relative;
   & > div {
     display: inline-block;
   }
@@ -37,4 +38,20 @@
 .power-control-wrapper {
   float: right;
   margin-right: 20px;
+}
+
+.inactive-blocker {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0,0.5);
+
+  svg {
+    height:100%;
+    width: 100%;
+    stroke-width: 1px;
+    stroke: red;
+  }
 }
