@@ -1,0 +1,23 @@
+<div *ngFor="let lightbulb of lightbulbs | async" class="lightbulb-row">
+    <div class="flex-15">
+        <button mat-button (click)="togglePower(lightbulb)" [ngClass]="{'power-on': lightbulb.Power == 'on'}">
+            <mat-icon>power_settings_new</mat-icon>
+            {{lightbulb.Power}}
+        </button>
+    </div>
+    <div class="flex-25">
+        <div>{{lightbulb.Name}}</div>
+    </div>
+    <div class="flex-10">
+        <mat-slide-toggle [checked]="lightbulb.ColorMode != 2" (change)="toggleColorMode($event, lightbulb)">{{lightbulb.ColorMode == 2 ? 'CT' : 'HSV'}}</mat-slide-toggle>
+    </div>
+    <div class="flex-25">
+        <mat-slider class="ct-slider" *ngIf="lightbulb.ColorMode == 2" (change)="updateCt($event, lightbulb)" min="1700" max="6500"
+            [value]="lightbulb.Ct"></mat-slider>
+        <mat-slider class="hue-slider" *ngIf="lightbulb.ColorMode != 2" (change)="updateHue($event, lightbulb)" min="1" max="359"
+            [value]="lightbulb.Hue"></mat-slider>
+    </div>
+    <div class="flex-25">
+        <mat-slider class="bright-slider" (change)="updateBright($event, lightbulb)" min="1" max="100" [value]="lightbulb.Bright"></mat-slider>
+    </div>
+</div>

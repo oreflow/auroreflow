@@ -1,0 +1,55 @@
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+
+html, body {
+    height: 100%;
+}
+body {
+    background: #0147A7;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+}
+
+.flex-5, .flex-10, .flex-15, .flex-20,
+.flex-25, .flex-30, .flex-35, .flex-40,
+.flex-45, .flex-50, .flex-55, .flex-60,
+.flex-65, .flex-70, .flex-75, .flex-80,
+.flex-85, .flex-90, .flex-95, .flex-100 {
+    display: flex;
+}
+
+.flex-5 {flex: 5;}
+.flex-10 {flex: 10;}
+.flex-15 {flex: 15;}
+.flex-20 {flex: 20;}
+.flex-25 {flex: 25;}
+.flex-30 {flex: 30;}
+.flex-35 {flex: 35;}
+.flex-40 {flex: 40;}
+.flex-45 {flex: 45;}
+.flex-50 {flex: 50;}
+.flex-55 {flex: 55;}
+.flex-60 {flex: 60;}
+.flex-65 {flex: 65;}
+.flex-70 {flex: 70;}
+.flex-75 {flex: 75;}
+.flex-80 {flex: 80;}
+.flex-85 {flex: 85;}
+.flex-90 {flex: 90;}
+.flex-95 {flex: 95;}
+.flex-100 {flex: 100;}
+
+.hue-slider .mat-slider-track-background {
+    background: -webkit-linear-gradient(left, #FF0000, #FFFF00,#00FF00,#00FFFF,#0000FF,#FF00FF,#FF0000) !important;
+    transform: none !important;
+}
+.ct-slider .mat-slider-track-background {
+    background: -webkit-linear-gradient(left,#FF7A00, #FF8200, #FF9D3C, #FFA448, #FFAA54, #FFB569, #FFBC76, #FFC07F, #FFD4A8, #FFE5CE, #FFE5CE, #FFF0E8, #FFF6F6, #FFF9FF, #E2E8FF ) !important;
+    transform: none !important;
+}
+.ct-slider .mat-slider-track-fill,
+.hue-slider .mat-slider-track-fill {
+    background-color: rgba(0,0,0,0);
+    transform: none !important;
+}

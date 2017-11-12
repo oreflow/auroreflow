@@ -1,0 +1,16 @@
+.lightbulb-row {
+    display: flex;
+    flex-direction: row;
+    padding: 0 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.power-on {
+    color: orange;
+}
+
+mat-slider {
+    width: 100%;
+    margin: 0 10px;
+}

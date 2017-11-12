@@ -1,0 +1,27 @@
+<mat-selection-list #selectionList>
+    <mat-list-option *ngFor="let lightbulb of lightbulbs | async" [checkboxPosition]="before" (selectChange)="onSelectChange($event)" [value]="lightbulb">
+        <div>
+            <div>{{lightbulb.Name}}</div>
+        </div>
+    </mat-list-option>
+</mat-selection-list>
+<div class="controls">
+    <div class="flex-15">
+        <button mat-button (click)="togglePower(selectionList)" [ngClass]="{'power-on': power == 'on'}">
+            <mat-icon>power_settings_new</mat-icon>
+            {{power}}
+        </button>
+    </div>
+    <div class="flex-15">
+        <mat-slide-toggle [checked]="colorMode != 2" (change)="toggleColorMode($event, selectionList)">{{colorMode == 2 ? 'CT' : 'HSV'}}</mat-slide-toggle>
+    </div>
+    <div class="flex-35">
+        <mat-slider class="ct-slider" *ngIf="colorMode == 2" (change)="updateCt($event, selectionList)" min="1700" max="6500"
+            [value]="ct"></mat-slider>
+        <mat-slider class="hue-slider" *ngIf="colorMode != 2" (change)="updateHue($event, selectionList)" min="1" max="359"
+            [value]="hue"></mat-slider>
+    </div>
+    <div class="flex-35">
+        <mat-slider class="bright-slider" (change)="updateBright($event, selectionList)" min="1" max="100" [value]="bright"></mat-slider>
+    </div>
+</div>

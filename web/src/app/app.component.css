@@ -1,0 +1,29 @@
+main {
+  padding: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+  display: block;
+}
+
+mat-sidenav-container {
+  height: calc(100% - 64px);
+}
+
+.toolbar-icon {
+  cursor: pointer;
+}
+.toolbar-header,
+.toolbar-icon {
+  padding: 0 14px;
+  user-select: none;
+}
+
+.toolbar-header {
+  display: flex;
+  flex: 100;
+}
+
+.poweroffall-button {
+  float: right;
+}

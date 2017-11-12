@@ -1,0 +1,12 @@
+<div class="apartment-map-wrapper">
+    <div class="apartment-map">
+        <div class="room living-room" [ngClass]="lightstatus['living-room'] ? 'light-on' : 'light-off'" (click)="toggleRoom('living-room')"></div>
+        <div class="room living-room-right" [ngClass]="lightstatus['living-room-right'] ? 'light-on' : 'light-off'" (click)="toggleRoom('living-room-right')"></div>
+        <div class="room living-room-left" [ngClass]="lightstatus['living-room-left'] ? 'light-on' : 'light-off'" (click)="toggleRoom('living-room-left')"></div>
+        <div class="room kitchen" [ngClass]="lightstatus['kitchen'] ? 'light-on' : 'light-off'" (click)="toggleRoom('kitchen')"></div>
+        <div class="room bedroom" [ngClass]="lightstatus['bedroom'] ? 'light-on' : 'light-off'" (click)="toggleRoom('bedroom')"></div>
+        <div class="room hallway" [ngClass]="lightstatus['hallway'] ? 'light-on' : 'light-off'" (click)="toggleRoom('hallway')"></div>
+        <div class="room entrance" [ngClass]="lightstatus['entrance'] ? 'light-on' : 'light-off'" (click)="toggleRoom('entrance')"></div>
+        <div class="room bathroom" [ngClass]="lightstatus['bathroom'] ? 'light-on' : 'light-off'" (click)="toggleRoom('bathroom')"></div>
+    </div>
+</div>

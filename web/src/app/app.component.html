@@ -1,0 +1,14 @@
+<mat-toolbar>
+  <i class="toolbar-icon material-icons" (click)="toggleSidenav()">menu</i>
+  <span class="toolbar-header">Auroreflow</span>
+  <button mat-button (click)="powerOffAll()" class="poweroffall-button">
+    <mat-icon>highlight_off</mat-icon>
+    All off
+  </button>
+</mat-toolbar>
+<mat-sidenav-container>
+  <mat-sidenav [opened]="sidenavOpen">
+    <auroreflow-sidenav></auroreflow-sidenav>
+  </mat-sidenav>
+  <router-outlet></router-outlet>
+</mat-sidenav-container>
