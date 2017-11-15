@@ -24,10 +24,10 @@ import { LightbulbService } from '../service/lightbulb.service';
 import { Lightbulb } from '../model/lightbulb';
 
 @Component({
-    template: require('./lightbulblist.component.html'),
-    styles: [require('./lightbulblist.component.css')],
+    template: require('./powerlist.component.html'),
+    styles: [require('./powerlist.component.css')],
 })
-export class LightbulblistComponent implements OnInit {
+export class PowerlistComponent implements OnInit {
     private lightbulbs: Observable<Lightbulb[]>;
 
     constructor(private lightbulbService: LightbulbService) { }
@@ -39,41 +39,12 @@ export class LightbulblistComponent implements OnInit {
     togglePower(lightbulb: Lightbulb) {
         if (lightbulb.Power === 'on') {
             lightbulb.Power = 'off';
+            this.lightbulbService.sendPowerUpdate(lightbulb);
         } else {
+            lightbulb.Ct = 3600;
+            lightbulb.Bright = 50;
             lightbulb.Power = 'on';
-        }
-        this.lightbulbService.sendPowerUpdate(lightbulb);
-    }
-
-    toggleColorMode(toggleChange: MatSlideToggleChange, lightbulb: Lightbulb) {
-        lightbulb.Power = 'on';
-        if (toggleChange.checked) {
-            this.lightbulbService.sendHsvUpdate(lightbulb);
-        } else {
             this.lightbulbService.sendCtUpdate(lightbulb);
-        }
-    }
-
-    updateHue(sliderChange: MatSliderChange, lightbulb: Lightbulb) {
-        lightbulb.Power = 'on';
-        lightbulb.Sat = 100;
-        lightbulb.Hue = sliderChange.value;
-        this.lightbulbService.sendHsvUpdate(lightbulb);
-    }
-
-    updateCt(sliderChange: MatSliderChange, lightbulb: Lightbulb) {
-        lightbulb.Power = 'on';
-        lightbulb.Ct = sliderChange.value;
-        this.lightbulbService.sendCtUpdate(lightbulb);
-    }
-
-    updateBright(sliderChange: MatSliderChange, lightbulb: Lightbulb) {
-        lightbulb.Power = 'on';
-        lightbulb.Bright = sliderChange.value;
-        if(lightbulb.ColorMode == 1) {
-            this.lightbulbService.sendCtUpdate(lightbulb);
-        } else {
-            this.lightbulbService.sendHsvUpdate(lightbulb);
         }
     }
 }

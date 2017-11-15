@@ -56,28 +56,30 @@ export class MapComponent implements OnInit {
     constructor(private lightbulbService: LightbulbService) { }
 
     ngOnInit(): void {
-        this.lightbulbService.getLightbulbs().subscribe(lightbulbList => {
-            lightbulbList.forEach(lightbulb => {
-                const room = ROOM_BY_LIGHTBULB_ID[lightbulb.Id];
-                if(!this.lightbulbsByRoom[room]) {
-                    this.lightbulbsByRoom[room] = [];
-                }
-                this.lightbulbsByRoom[room].push(lightbulb);
-                if(lightbulb.Power === 'on') {
-                    this.lightstatus[room] = true;
-                }
-            })
-        });
+        this.lightbulbService.getLightbulbs(true)
+            .subscribe(lightbulbList => {
+                this.lightbulbsByRoom = {};
+                lightbulbList.forEach(lightbulb => {
+                    const room = ROOM_BY_LIGHTBULB_ID[lightbulb.Id];
+                    if (!this.lightbulbsByRoom[room]) {
+                        this.lightbulbsByRoom[room] = [];
+                        this.lightstatus[room] = false;
+                    }
+                    this.lightbulbsByRoom[room].push(lightbulb);
+                    if (lightbulb.Power === 'on') {
+                        this.lightstatus[room] = true;
+                    }
+                })
+            });
     }
-    toggleRoom(room: string) {
-        console.log(room);
-        this.lightstatus[room] = !this.lightstatus[room];
 
+    toggleRoom(room: string) {
+        this.lightstatus[room] = !this.lightstatus[room];
         this.lightbulbsByRoom[room].forEach(lightbulb => {
             if (this.lightstatus[room]) {
                 lightbulb.Power = 'on';
-                lightbulb.Ct = 3600
-                lightbulb.Bright = 50
+                lightbulb.Ct = 3600;
+                lightbulb.Bright = 50;
                 this.lightbulbService.sendCtUpdate(lightbulb);
             } else {
                 lightbulb.Power = 'off';

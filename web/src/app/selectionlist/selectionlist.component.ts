@@ -34,12 +34,12 @@ export class SelectionlistComponent implements OnInit {
     ct = 3000;
     hue = 100;
     bright = 40;
-    colorMode = 2;
+    colorMode = 1;
 
     constructor(private lightbulbService: LightbulbService) { }
 
     ngOnInit(): void {
-        this.lightbulbs = this.lightbulbService.getLightbulbs();
+        this.lightbulbs = this.lightbulbService.getLightbulbs(true);
     }
 
     togglePower(selectionList: MatSelectionList) {
@@ -106,7 +106,7 @@ export class SelectionlistComponent implements OnInit {
             const lightbulb: Lightbulb = lightbulbOption.value;
             lightbulb.Power = this.power;
             lightbulb.Bright = this.bright;
-            if (lightbulb.ColorMode == 2) {
+            if (this.colorMode == 1) {
                 this.lightbulbService.sendCtUpdate(lightbulb);
             } else {
                 this.lightbulbService.sendHsvUpdate(lightbulb);

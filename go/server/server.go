@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"github.com/gorilla/websocket"
 )
 
 const BROADCAST_INTERVAL = 10 * time.Minute
@@ -19,39 +20,53 @@ func broadcastForLighbulbsThread() {
 		time.Sleep(BROADCAST_INTERVAL)
 	}
 }
+func writeEmptyResponse(w http.ResponseWriter) {
+	_, err := w.Write([]byte("{}"))
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 func handleUpdateCtRequest(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	var request lightbulbs.CtRequest
 	json.Unmarshal(body, &request)
-	lightbulbs.UpdateCt(request)
+	lightbulb := lightbulbs.UpdateCt(request)
+	writeEmptyResponse(w)
+	go broadCastToSockets(lightbulb)
 }
 
 func handleUpdateHsvRequest(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	var request lightbulbs.HsvRequest
 	json.Unmarshal(body, &request)
-	lightbulbs.UpdateHsv(request)
+	lightbulb := lightbulbs.UpdateHsv(request)
+	writeEmptyResponse(w)
+	go broadCastToSockets(lightbulb)
 }
 
 func handleUpdatePowerRequest(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	var request lightbulbs.PowerRequest
 	json.Unmarshal(body, &request)
-	lightbulbs.UpdatePower(request)
+	lightbulb := lightbulbs.UpdatePower(request)
+	writeEmptyResponse(w)
+	go broadCastToSockets(lightbulb)
 }
 func handleUpdateNameRequest(w http.ResponseWriter, r *http.Request) {
+	writeEmptyResponse(w)
 }
 
 func handleListRequest(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +79,28 @@ func handleListRequest(w http.ResponseWriter, r *http.Request) {
 
 func handlePoweroffRequest(w http.ResponseWriter, r *http.Request) {
 	lightbulbs.PowerOffAll()
+	writeEmptyResponse(w)
+}
+
+var websocketclients = make(map[*websocket.Conn]bool)
+var upgrader = websocket.Upgrader{}
+
+func handleWebsocketConnection(w http.ResponseWriter, r *http.Request) {
+    ws, err := upgrader.Upgrade(w, r, nil)
+    if err != nil {
+        log.Println(err)
+    }
+    websocketclients[ws] = true
+}
+
+func broadCastToSockets(lightbulb lightbulbs.Lightbulb) {
+    for client, _ := range websocketclients {
+        err := client.WriteJSON(lightbulb)
+        if err != nil {
+        	log.Println(err)
+        	delete(websocketclients, client)
+		}
+    }
 }
 
 func main() {
@@ -72,6 +109,7 @@ func main() {
 
 	fs := http.FileServer(http.Dir("../web/public/"))
 	http.Handle("/", fs)
+	http.HandleFunc("/ws", handleWebsocketConnection)
 	http.HandleFunc("/lightbulb/update/ct", handleUpdateCtRequest)
 	http.HandleFunc("/lightbulb/update/hsv", handleUpdateHsvRequest)
 	http.HandleFunc("/lightbulb/update/power", handleUpdatePowerRequest)

@@ -6,6 +6,7 @@ import { ReactiveFormsModule}  from '@angular/forms';
 import { AppComponent } from './app.component';
 import { LightbulblistComponent } from './lightbulblist/lightbulblist.component';
 import { MapComponent } from './map/map.component';
+import { PowerlistComponent } from './powerlist/powerlist.component';
 import { SelectionlistComponent } from './selectionlist/selectionlist.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { LightbulbService } from './service/lightbulb.service';
@@ -24,7 +25,9 @@ import {
 import { RouterModule, Routes } from '@angular/router';
 
 const appRoutes: Routes = [
+  { path: 'apartmentmap', component: MapComponent },
   { path: 'map', component: MapComponent },
+  { path: 'power', component: PowerlistComponent },
   { path: 'selection', component: SelectionlistComponent },
   { path: '', component: LightbulblistComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' },
@@ -50,6 +53,7 @@ const appRoutes: Routes = [
     AppComponent,
     LightbulblistComponent,
     MapComponent,
+    PowerlistComponent,
     SelectionlistComponent,
     SidenavComponent,
   ],

@@ -65,13 +65,13 @@ var lightbulbList map[int64]Lightbulb
 func init() {
 	tmpAddr, err := net.ResolveUDPAddr("udp", BROADCAST_ADDRESS)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	addr = tmpAddr
 	c, err := net.ListenUDP("udp", nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	conn = c
@@ -87,7 +87,7 @@ func UdpListener() {
 		buf := make([]byte, 2048)
 		n, _, err := conn.ReadFromUDP(buf)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		parseMessageAndStoreLightbulb(string(buf[0:n]))
 	}
@@ -103,7 +103,7 @@ func parseMessageAndStoreLightbulb(message string) {
 	}
 	id, err := strconv.ParseInt(rowMap["id"], 0, 32)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	bright, _:= strconv.ParseInt(rowMap["bright"], 10, 32)
@@ -141,35 +141,52 @@ func GetLightbulbs() []Lightbulb {
 
 func PowerOffAll() {
 	for _, value := range lightbulbList {
+		value.Power = "off"
 		UpdatePower(PowerRequest{value.Id, "off"})
 	}
 }
 
-func UpdatePower(request PowerRequest) {
+func UpdatePower(request PowerRequest) Lightbulb {
+	lightbulb := lightbulbList[request.Id]
+	lightbulb.Power = request.Power
 	requestString := fmt.Sprintf(
 		"{\"id\": 1, " +
 			"\"method\": \"set_power\", " +
 			"\"params\":[\"%s\"]}\r\n",
 		request.Power)
 	sendRequest(request.Id, requestString)
+	return lightbulb
 }
 
-func UpdateHsv(request HsvRequest) {
+func UpdateHsv(request HsvRequest) Lightbulb {
+	lightbulb := lightbulbList[request.Id]
+	lightbulb.Power = "on"
+	lightbulb.Hue = request.Hue
+	lightbulb.Sat = request.Sat
+	lightbulb.Bright = request.Bright
+	lightbulb.ColorMode = 2
 	requestString := fmt.Sprintf(
 		"{\"id\": 1, " +
 			"\"method\": \"set_scene\", " +
 			"\"params\":[\"hsv\", %d, %d, %d]}\r\n",
 		request.Hue, request.Sat, request.Bright)
 	sendRequest(request.Id, requestString)
+	return lightbulb
 }
 
-func UpdateCt(request CtRequest) {
+func UpdateCt(request CtRequest) Lightbulb {
+	lightbulb := lightbulbList[request.Id]
+	lightbulb.Power = "on"
+	lightbulb.ColorMode = 1
+	lightbulb.Ct = request.Ct
+	lightbulb.Bright = request.Bright
 	requestString := fmt.Sprintf(
 		"{\"id\": 1, " +
 			"\"method\": \"set_scene\", " +
 			"\"params\":[\"ct\", %d, %d]}\r\n",
 		request.Ct, request.Bright)
 	sendRequest(request.Id, requestString)
+	return lightbulb
 }
 
 func UpdateName() {
@@ -180,8 +197,9 @@ func sendRequest(id int64, request string) {
 	bulb := lightbulbList[id]
 	bulbConn, err := net.Dial("tcp", bulb.Location)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	bulbConn.Write([]byte(request))
 	bulbConn.Close()
 }
+

@@ -1,0 +1,11 @@
+<div *ngFor="let lightbulb of lightbulbs | async" class="lightbulb-row">
+    <div class="flex-15">
+        <button mat-button (click)="togglePower(lightbulb)" [ngClass]="{'power-on': lightbulb.Power == 'on'}">
+            <mat-icon>power_settings_new</mat-icon>
+            {{lightbulb.Power}}
+        </button>
+    </div>
+    <div class="flex-85">
+        <div>{{lightbulb.Name}}</div>
+    </div>
+</div>

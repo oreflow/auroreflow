@@ -19,8 +19,6 @@ import { Observable } from 'rxjs/Observable';
 
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/toPromise';
-
 
 import { Lightbulb } from '../model/lightbulb';
 import {
@@ -29,44 +27,87 @@ import {
     NameRequest,
     PowerRequest
 } from "../model/lightbulbrequest";
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class LightbulbService {
     private PUT_HEADERS = new Headers({ 'Content-Type': 'application/json' });
-    lightbulbs: Observable<Lightbulb[]>;
+    lightbulbSubject: Subject<Lightbulb[]> = new Subject();
+    lightbulbs: Lightbulb[];
+    private websocket: WebSocket;
 
     constructor(private http: HttpClient) {
         //this.lightbulbs = Observable.of<any>([{"Id":56285014,"Location":"192.168.0.208:55443","Power":"on","Bright":40,"Ct":4117,"Hue":193,"Sat":90,"ColorMode":2,"Name":"Livingroom(right)","IsActive":true,"LastChangeMillis":1510506754}, {"Id":56285014,"Location":"192.168.0.208:55443","Power":"on","Bright":40,"Ct":4117,"Hue":193,"Sat":90,"ColorMode":2,"Name":"Livingroom(left)","IsActive":true,"LastChangeMillis":1510506754}]);
-        this.lightbulbs = http.get<Lightbulb[]>('lightbulb/list');
+        this.connectWebsocket();
+        this.getLightbulbs(true);
     }
 
-    getLightbulbs() {
-        return this.lightbulbs;
+    connectWebsocket() {
+        if(this.websocket) {
+            this.websocket.close();
+        } 
+        this.websocket = new WebSocket('ws://' + window.location.host + '/ws');
+        this.websocket.onmessage = (message) => this.bulbUpdateHandler(message);
+    }
+
+    bulbUpdateHandler(message: MessageEvent) {
+        const lightbulb: Lightbulb = JSON.parse(message.data);
+        const existingBulb = this.lightbulbs.find(bulb => bulb.Id == lightbulb.Id);
+        if(existingBulb) {
+            if (JSON.stringify(existingBulb) == JSON.stringify(lightbulb)) {
+                return;
+            } 
+            existingBulb.Power = lightbulb.Power;
+            existingBulb.Bright = lightbulb.Bright;
+            existingBulb.Ct = lightbulb.Ct;
+            existingBulb.Hue = lightbulb.Hue;
+            existingBulb.Sat = lightbulb.Sat;
+            existingBulb.ColorMode = lightbulb.ColorMode;
+            existingBulb.Name = lightbulb.Name;
+            existingBulb.IsActive = lightbulb.IsActive;
+            existingBulb.LastChangeMillis = lightbulb.LastChangeMillis;
+        } else {
+            this.lightbulbs.push(lightbulb);
+        }
+        this.lightbulbs = this.lightbulbs.sort((bulbA, bulbB) => bulbA.Name.localeCompare(bulbB.Name));
+        this.lightbulbSubject.next(this.lightbulbs);
+    }
+
+    getLightbulbs(forceNext: boolean) {
+        this.http.get<Lightbulb[]>('lightbulb/list').subscribe(data => {
+            if (forceNext || !this.lightbulbs || data.length != this.lightbulbs.length) {
+                this.lightbulbs = data.sort((bulbA, bulbB) => bulbB.Name.localeCompare(bulbA.Name));
+                this.lightbulbSubject.next(this.lightbulbs);
+            }
+        });
+        return this.lightbulbSubject.asObservable();
     }
 
     /**
      * Sends a Hsv update request using the HSV values provided in the Lightbulb object
      */
     sendHsvUpdate(lightbulb: Lightbulb): void {
+        lightbulb.ColorMode = 2;
         const request: HsvRequest  = {
             Id: lightbulb.Id,
             Hue: lightbulb.Hue,
             Sat: lightbulb.Sat,
             Bright: lightbulb.Bright
         }
-        this.http.put('lightbulb/update/hsv', JSON.stringify(request)).toPromise();
+        this.http.put('lightbulb/update/hsv', JSON.stringify(request)).subscribe();
     }
 
     /**
      * Sends a Ct update request using the Ct values provided in the Lightbulb object
      */
     sendCtUpdate(lightbulb: Lightbulb): void {
+        lightbulb.ColorMode = 1;
         const request: CtRequest  = {
             Id: lightbulb.Id,
             Ct: lightbulb.Ct,
             Bright: lightbulb.Bright
         }
-        this.http.put('lightbulb/update/ct', JSON.stringify(request)).toPromise();
+        this.http.put('lightbulb/update/ct', JSON.stringify(request)).subscribe();
     }
 
     /**
@@ -77,7 +118,7 @@ export class LightbulbService {
             Id: lightbulb.Id,
             Power: lightbulb.Power
         };
-        this.http.put('lightbulb/update/power', JSON.stringify(request)).toPromise();
+        this.http.put('lightbulb/update/power', JSON.stringify(request)).subscribe();
     }
 
     /**
@@ -90,6 +131,6 @@ export class LightbulbService {
      * Sends a power off all bulbs request
      */
     sendPowerOffAll(): void {
-        this.http.get('poweroff').toPromise();
+        this.http.get('poweroff').subscribe();
     }
 }
