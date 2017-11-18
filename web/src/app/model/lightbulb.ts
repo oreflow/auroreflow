@@ -24,5 +24,4 @@ export class Lightbulb {
     ColorMode: number;
     Name: string;
     IsActive: boolean;
-    LastChangeMillis: string;
 }

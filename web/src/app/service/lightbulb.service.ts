@@ -37,7 +37,6 @@ export class LightbulbService {
     private websocket: WebSocket;
 
     constructor(private http: HttpClient) {
-        //this.lightbulbs = Observable.of<any>([{"Id":56285014,"Location":"192.168.0.208:55443","Power":"on","Bright":40,"Ct":4117,"Hue":193,"Sat":90,"ColorMode":2,"Name":"Livingroom(right)","IsActive":true,"LastChangeMillis":1510506754}, {"Id":56285014,"Location":"192.168.0.208:55443","Power":"on","Bright":40,"Ct":4117,"Hue":193,"Sat":90,"ColorMode":2,"Name":"Livingroom(left)","IsActive":true,"LastChangeMillis":1510506754}]);
         this.connectWebsocket();
         this.getLightbulbs(true);
     }
@@ -65,7 +64,6 @@ export class LightbulbService {
             existingBulb.ColorMode = lightbulb.ColorMode;
             existingBulb.Name = lightbulb.Name;
             existingBulb.IsActive = lightbulb.IsActive;
-            existingBulb.LastChangeMillis = lightbulb.LastChangeMillis;
         } else {
             this.lightbulbs.push(lightbulb);
         }
@@ -76,7 +74,7 @@ export class LightbulbService {
     getLightbulbs(forceNext: boolean) {
         this.http.get<Lightbulb[]>('lightbulb/list').subscribe(data => {
             if (forceNext || !this.lightbulbs || data.length != this.lightbulbs.length) {
-                this.lightbulbs = data.sort((bulbA, bulbB) => bulbB.Name.localeCompare(bulbA.Name));
+                this.lightbulbs = data.sort((bulbA, bulbB) => bulbA.Name.localeCompare(bulbB.Name));
                 this.lightbulbSubject.next(this.lightbulbs);
             }
         });

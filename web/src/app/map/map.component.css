@@ -1,92 +1,18 @@
-.apartment-map-wrapper {
-    position: absolute;
+button {
+    height: 100%;
     width: 100%;
 }
-
-.apartment-map-wrapper:after {
-    padding-top: 140%;
-    /* 16:9 ratio */
-    display: block;
-    content: '';
-  }
-
-.apartment-map {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
+mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
 }
-
-.room {
-    position: absolute;
-    border-radius: 15px;
-}
-
 .light-off {
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0,rgba(0,0,0,0.6) 100%);
+    color: rgba(0,0,0,0.6);
 }
-
-.light-on {
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0,rgba(255,255,0,0.2) 100%);
+.room {
+    background-color: lightgray;
 }
-
-.living-room {
-    background-color: #e53935;
-    top: 5%;
-    left: 5%;
-    width: 50%;
-    height: 50%;
-}
-
-.living-room-right {
-    background-color: #D81B60;
-    top: 10%;
-    left: 0;
-    height: 15%;
-    width: 15%;
-}
-
-.living-room-left {
-    background-color: #8E24AA;
-    top: 35%;
-    left: 0;
-    height: 15%;
-    width: 15%;
-}
-.kitchen {
-    background-color: #1E88E5;
-    top: 55%;
-    left: 5%;
-    height: 15%;
-    width: 45%;
-}
-.bedroom {
-    background-color: #00ACC1;
-    top: 15%;
-    left: 55%;
-    width: 40%;
-    height: 35%;
-}
-.hallway {
-    background-color: #43A047;
-    top: 50%;
-    left: 45%;
-    height: 15%;
-    width: 45%;
-}
-.entrance {
-    background-color: #FDD835;
-    top: 65%;
-    left: 75%;
-    height: 30%;
-    width: 15%;
-}
-.bathroom {
-    background-color: #FB8C00;
-    top: 70%;
-    left: 30%;
-    height: 20%;
-    width: 45%;
-
+mat-grid-list {
+    max-width: 80vh
 }

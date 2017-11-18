@@ -1,12 +1,101 @@
+
+<mat-grid-list cols="12" rowHeight="1:1">
+    <mat-grid-tile [colspan]="1" [rowspan]="3" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['living-room-right'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('living-room-right')">
+            <mat-icon>power_settings_new</mat-icon>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="6" [rowspan]="6" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['living-room'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('living-room')">
+            <mat-icon>power_settings_new</mat-icon>
+            <div>Livingroom</div>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="5" [rowspan]="1">
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="5" [rowspan]="5" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['bedroom'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('bedroom')">
+            <mat-icon>power_settings_new</mat-icon>
+            <div>Bedroom</div>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="3" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['living-room-left'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('living-room-left')">
+            <mat-icon>power_settings_new</mat-icon>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="6" [rowspan]="2" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['kitchen'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('kitchen')">
+            <mat-icon>power_settings_new</mat-icon>
+            <div>Kitchen</div>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="6" [rowspan]="2" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['hallway'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('hallway')">
+            <mat-icon>power_settings_new</mat-icon>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="4" [rowspan]="4"></mat-grid-tile>
+    <mat-grid-tile [colspan]="6" [rowspan]="4" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['bathroom'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('bathroom')">
+            <mat-icon>power_settings_new</mat-icon>
+            <div>Bathroom</div>
+        </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="2" [rowspan]="4" class="room">
+        <button mat-icon-button color="accent"
+            [ngClass]="lightstatus['entrance'] ? 'light-on' : 'light-off'" 
+            (click)="toggleRoom('entrance')">
+            <mat-icon>power_settings_new</mat-icon>
+        </button>
+    </mat-grid-tile>
+</mat-grid-list>
+        <!--
 <div class="apartment-map-wrapper">
     <div class="apartment-map">
-        <div class="room living-room" [ngClass]="lightstatus['living-room'] ? 'light-on' : 'light-off'" (click)="toggleRoom('living-room')"></div>
-        <div class="room living-room-right" [ngClass]="lightstatus['living-room-right'] ? 'light-on' : 'light-off'" (click)="toggleRoom('living-room-right')"></div>
-        <div class="room living-room-left" [ngClass]="lightstatus['living-room-left'] ? 'light-on' : 'light-off'" (click)="toggleRoom('living-room-left')"></div>
-        <div class="room kitchen" [ngClass]="lightstatus['kitchen'] ? 'light-on' : 'light-off'" (click)="toggleRoom('kitchen')"></div>
-        <div class="room bedroom" [ngClass]="lightstatus['bedroom'] ? 'light-on' : 'light-off'" (click)="toggleRoom('bedroom')"></div>
-        <div class="room hallway" [ngClass]="lightstatus['hallway'] ? 'light-on' : 'light-off'" (click)="toggleRoom('hallway')"></div>
-        <div class="room entrance" [ngClass]="lightstatus['entrance'] ? 'light-on' : 'light-off'" (click)="toggleRoom('entrance')"></div>
-        <div class="room bathroom" [ngClass]="lightstatus['bathroom'] ? 'light-on' : 'light-off'" (click)="toggleRoom('bathroom')"></div>
+
+        <button mat-icon-button class="room living-room" color="accent">
+            <i class="material-icon">power_settings_new</i>
+            <div>Livingroom</div>
+        </button>
+        <mat-button-toggle class="room living-room" [checked]="lightstatus['living-room']" (change)="toggleRoom($event, 'living-room')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle class="room living-room-right" [ngClass]="lightstatus['living-room-right'] ? 'light-on' : 'light-off'" (change)="toggleRoom('living-room-right')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle class="room living-room-left" [ngClass]="lightstatus['living-room-left'] ? 'light-on' : 'light-off'" (change)="toggleRoom('living-room-left')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle class="room kitchen" [ngClass]="lightstatus['kitchen'] ? 'light-on' : 'light-off'" (change)="toggleRoom('kitchen')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle class="room bedroom" [ngClass]="lightstatus['bedroom'] ? 'light-on' : 'light-off'" (change)="toggleRoom('bedroom')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle class="room hallway" [ngClass]="lightstatus['hallway'] ? 'light-on' : 'light-off'" (change)="toggleRoom('hallway')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle class="room entrance" [ngClass]="lightstatus['entrance'] ? 'light-on' : 'light-off'" (change)="toggleRoom('entrance')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle class="room bathroom" [ngClass]="lightstatus['bathroom'] ? 'light-on' : 'light-off'" (change)="toggleRoom('bathroom')">
+            <mat-icon>power_settings_new</mat-icon>
+        </mat-button-toggle>
     </div>
 </div>
+    -->

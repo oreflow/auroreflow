@@ -15,6 +15,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { environment } from '../environments/environment';
 import { 
   MatButtonModule,
+  MatButtonToggleModule,
   MatGridListModule,
   MatIconModule,
   MatListModule, 
@@ -39,6 +40,7 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     HttpClientModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatGridListModule,
     MatIconModule,
     MatListModule,
