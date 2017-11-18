@@ -1,18 +1,44 @@
-button {
-    height: 100%;
-    width: 100%;
+.map-section svg {
+    max-height: calc(100vh - 64px);
+    max-width: 100vw;
 }
-mat-icon {
-    font-size: 48px;
-    height: 48px;
-    width: 48px;
-}
-.light-off {
-    color: rgba(0,0,0,0.6);
+@media screen and (orientation:landscape) {
+  .map-section svg {
+    transform: rotate(-90deg);
+    max-height: 100vw;
+    max-width: calc(100vh - 64px);
+    position: absolute;
+    top: -22vh;
+    left: 23vh;
+  }
 }
 .room {
-    background-color: lightgray;
+  stroke-width: 16px;
+  stroke: #555555;
+  fill: #FFFFFF;
 }
-mat-grid-list {
-    max-width: 80vh
+.window-rect {
+  stroke-width: 1px;
+  stroke: #000000;
+  fill: #FFFFFF;
+}
+.door-frame {
+  stroke-width: 1px;
+  stroke: #FFFFFF;
+  fill: #FFFFFF;
+}
+.door-door {
+  stroke-width: 8px;
+  stroke: brown;
+}
+.balcony {
+  fill: gray;
+}
+
+.light-icon {
+    cursor: pointer;
+    user-select: none;
+}
+.light-icon.light-on {
+    fill: orange;
 }

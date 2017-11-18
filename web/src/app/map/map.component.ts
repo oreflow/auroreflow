@@ -24,15 +24,15 @@ import { LightbulbService } from '../service/lightbulb.service';
 import { Lightbulb } from '../model/lightbulb';
 
 const ROOM_BY_LIGHTBULB_ID = {
-    56238300: 'living-room-left',
-    56285014: 'living-room-right',
-    56313741: 'living-room',
-    56279812: 'living-room',
+    56238300: 'livingroom-left',
+    56285014: 'livingroom-right',
+    56313741: 'livingroom',
+    56279812: 'livingroom',
     56310745: 'kitchen',
     56276376: 'bedroom',
     56312564: 'bedroom',
     56232341: 'hallway',
-    56310674: 'entrance',
+    56310674: 'hallway',
     56229429: 'bathroom'
 };
 
@@ -42,13 +42,12 @@ const ROOM_BY_LIGHTBULB_ID = {
 })
 export class MapComponent implements OnInit {
     lightstatus: { [room: string]: boolean } = {
-        'living-room': false,
-        'living-room-right': false,
-        'living-room-left': false,
+        'livingroom': false,
+        'livingroom-right': false,
+        'livingroom-left': false,
         'kitchen': false,
         'bedroom': false,
         'hallway': false,
-        'entrance': false,
         'bathroom': false,
     };
     lightbulbsByRoom: {[room: string]: Lightbulb[]} = {};
@@ -71,6 +70,29 @@ export class MapComponent implements OnInit {
                     }
                 })
             });
+    }
+    handleClick(event: MouseEvent) {
+        const eventTarget = <HTMLElement>event.target;
+        if (eventTarget && eventTarget.classList[0] == 'room' || eventTarget.classList[0] == 'light-icon') {
+            let room = eventTarget.classList[1];
+            console.log(room)
+            switch (room) {
+                case 'livingroom':
+                case 'livingroom-right':
+                case 'livingroom-left':
+                case 'kitchen':
+                case 'bedroom':
+                case 'bathroom':
+                    this.toggleRoom(room)
+                    break;
+                case 'hallway':
+                case 'wardrobe1':
+                case 'wardrobe2':
+                    this.toggleRoom('hallway')
+                    break;
+                default:
+            }
+        }
     }
 
     toggleRoom(room: string) {

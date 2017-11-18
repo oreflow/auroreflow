@@ -1,101 +1,90 @@
+<div class="map-section">
+    <svg viewBox="0 0 635 945" (click)="handleClick($event)">
+        <defs>
+            <radialGradient id="shine-effect">
+                <stop offset="0%" stop-color="yellow"/>
+                <stop offset="20%" stop-color="yellow"/>
+                <stop offset="70%" stop-color="hsla(60,100%,50%, 0.5)"/>
+                <stop offset="100%" stop-color="hsla(60,100%,50%, 0)"/>
+            </radialGradient>
 
-<mat-grid-list cols="12" rowHeight="1:1">
-    <mat-grid-tile [colspan]="1" [rowspan]="3" class="room">
-        <button mat-icon-button color="accent"
-            [ngClass]="lightstatus['living-room-right'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('living-room-right')">
-            <mat-icon>power_settings_new</mat-icon>
-        </button>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="6" [rowspan]="6" class="room">
-        <button mat-icon-button color="accent"
-            [ngClass]="lightstatus['living-room'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('living-room')">
-            <mat-icon>power_settings_new</mat-icon>
-            <div>Livingroom</div>
-        </button>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="5" [rowspan]="1">
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="5" [rowspan]="5" class="room">
-        <button mat-icon-button color="accent"
+            <g id="toggleable-lightbulb-svg-on">
+                <circle r="180" style="fill:url(#shine-effect);" />
+            </g>
+            <g id="toggleable-lightbulb-svg-off">
+                <circle r="180" style="fill:transparent; stroke: darkgray; stroke-width: 1px;" />
+            </g>
+
+            <g id="window">
+                <rect class="window-rect" x="0" y="-8" width="100" height="8"/>
+                <rect class="window-rect" x="0" y="0" width="100" height="8"/>
+            </g>
+
+            <g id="door">
+                <rect class="door-frame" x="0" y="-8" width="80" height="16"/>
+                <line class="door-door" x1="0" y1="0" x2="77" y2="21" width="80"/>
+                <path d="M 0 0 L 80 0 A 80 80 0 0 1 77 21" stroke="black" stroke-width"1px"  fill="transparent"/>
+            </g>
+        </defs>
+
+        <polygon class="room livingroom" points="10,10 390,10 390,90 350,90 350,500 290,545 240,515 10,515"></polygon>
+        <polygon class="room bedroom" points="350,130 390,130 390,90 625,90 625,515 375,515 350,500"></polygon>
+        <polygon class="room kitchen" points="10,515 240,515 290,545 300,551 300,690 10,690"></polygon>
+        <polygon class="room hallway" points="350,500 375,515 625,515 625,935 525,935 525,615 300,615 300,551 290,545"></polygon>
+        <polygon class="room wardrobe1" points="325,615 425,615 425,695 325,695"></polygon>
+        <polygon class="room wardrobe2" points="425,615 525,615 525,695 425,695"></polygon>
+        <polygon class="room bathroom" points="350,695 525,695 525,910 420,910 420,840 310,840 310,770 350,770"></polygon>
+        <polygon class="balcony" points="396,0 633,0 633,84 396,84"></polygon>
+
+        <!-- Livingroom window and door -->
+        <use href="#window" class="livingroom-window" transform="translate(90, 10) scale(0.6, 1)"/>
+        <use href="#window" class="livingroom-window" transform="translate(150, 10) scale(1.2, 1)"/>
+        <use href="#door" class="livingroom-window" transform="translate(390, 10) rotate(90) scale(-1, 1) translate(-80, 0)"/>
+
+        <!-- Opening to kitchen -->
+        <line x1="90" y1="515" x2="210" y2="515" stroke="#FFFFFF" stroke-width="20" fill="white"/>
+
+        <!-- Livingroom - Corridor-->
+        <use href="#door" class="livingroom-corridoor-door"transform="translate(355, 495) rotate(142) scale(-1, 1) translate(-80, 0)"/>
+
+        <!-- Bedroom window -->
+        <use href="#window" class="bedroom-window" transform="translate(400, 90) scale(1.2, 1)"/>
+        <use href="#door" class="bedroom-balcony-door" transform="translate(520, 90)"/>
+        <use href="#door" class="bedroom-door" transform="translate(605, 515) rotate(180)"/>
+
+        <!-- Wardrobe doors -->
+        <use href="#door" class="wardrobe1-door" transform="translate(335, 615) scale(0.75, -1)"/>
+        <use href="#door" class="wardrobe2-door" transform="translate(440, 615) scale(0.75, -1)"/>
+
+        <!-- Bathroom door -->
+        <use href="#door" class="bathroom-door" transform="translate(525, 800) rotate(90)"/>
+
+        <!-- Entrance door-->
+        <use href="#door" class="entrance-door" transform="translate(615, 935) rotate(180)"/>
+
+
+        <text 
+            class="light-icon livingroom" 
+            [ngClass]="lightstatus['livingroom'] ? 'light-on' : 'light-off'" 
+            font-family="'Material Icons'" x="150" y="300" font-size="100">power_settings_new</text>
+        <text class="light-icon livingroom-right"
+            [ngClass]="lightstatus['livingroom-right'] ? 'light-on' : 'light-off'" 
+            font-family="'Material Icons'" x="0" y="150" font-size="100">power_settings_new</text>
+        <text class="light-icon livingroom-left" 
+            [ngClass]="lightstatus['livingroom-left'] ? 'light-on' : 'light-off'" 
+            font-family="'Material Icons'" x="0" y="450" font-size="100">power_settings_new</text>
+        <text class="light-icon bedroom" 
             [ngClass]="lightstatus['bedroom'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('bedroom')">
-            <mat-icon>power_settings_new</mat-icon>
-            <div>Bedroom</div>
-        </button>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="1" [rowspan]="3" class="room">
-        <button mat-icon-button color="accent"
-            [ngClass]="lightstatus['living-room-left'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('living-room-left')">
-            <mat-icon>power_settings_new</mat-icon>
-        </button>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="6" [rowspan]="2" class="room">
-        <button mat-icon-button color="accent"
+            font-family="'Material Icons'" x="450" y="350" font-size="100">power_settings_new</text>
+        <text class="light-icon kitchen" 
             [ngClass]="lightstatus['kitchen'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('kitchen')">
-            <mat-icon>power_settings_new</mat-icon>
-            <div>Kitchen</div>
-        </button>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="6" [rowspan]="2" class="room">
-        <button mat-icon-button color="accent"
+            font-family="'Material Icons'" x="100" y="650" font-size="100">power_settings_new</text>
+        <text class="light-icon hallway" 
             [ngClass]="lightstatus['hallway'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('hallway')">
-            <mat-icon>power_settings_new</mat-icon>
-        </button>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="4" [rowspan]="4"></mat-grid-tile>
-    <mat-grid-tile [colspan]="6" [rowspan]="4" class="room">
-        <button mat-icon-button color="accent"
+            font-family="'Material Icons'" x="500" y="650" font-size="100">power_settings_new</text>
+        <text class="light-icon bathroom" 
             [ngClass]="lightstatus['bathroom'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('bathroom')">
-            <mat-icon>power_settings_new</mat-icon>
-            <div>Bathroom</div>
-        </button>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="2" [rowspan]="4" class="room">
-        <button mat-icon-button color="accent"
-            [ngClass]="lightstatus['entrance'] ? 'light-on' : 'light-off'" 
-            (click)="toggleRoom('entrance')">
-            <mat-icon>power_settings_new</mat-icon>
-        </button>
-    </mat-grid-tile>
-</mat-grid-list>
-        <!--
-<div class="apartment-map-wrapper">
-    <div class="apartment-map">
+            font-family="'Material Icons'" x="400" y="850" font-size="100">power_settings_new</text>
 
-        <button mat-icon-button class="room living-room" color="accent">
-            <i class="material-icon">power_settings_new</i>
-            <div>Livingroom</div>
-        </button>
-        <mat-button-toggle class="room living-room" [checked]="lightstatus['living-room']" (change)="toggleRoom($event, 'living-room')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle class="room living-room-right" [ngClass]="lightstatus['living-room-right'] ? 'light-on' : 'light-off'" (change)="toggleRoom('living-room-right')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle class="room living-room-left" [ngClass]="lightstatus['living-room-left'] ? 'light-on' : 'light-off'" (change)="toggleRoom('living-room-left')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle class="room kitchen" [ngClass]="lightstatus['kitchen'] ? 'light-on' : 'light-off'" (change)="toggleRoom('kitchen')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle class="room bedroom" [ngClass]="lightstatus['bedroom'] ? 'light-on' : 'light-off'" (change)="toggleRoom('bedroom')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle class="room hallway" [ngClass]="lightstatus['hallway'] ? 'light-on' : 'light-off'" (change)="toggleRoom('hallway')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle class="room entrance" [ngClass]="lightstatus['entrance'] ? 'light-on' : 'light-off'" (change)="toggleRoom('entrance')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle class="room bathroom" [ngClass]="lightstatus['bathroom'] ? 'light-on' : 'light-off'" (change)="toggleRoom('bathroom')">
-            <mat-icon>power_settings_new</mat-icon>
-        </mat-button-toggle>
-    </div>
+    </svg>
 </div>
-    -->
