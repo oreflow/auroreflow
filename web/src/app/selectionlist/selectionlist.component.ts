@@ -31,9 +31,9 @@ import { Lightbulb } from '../model/lightbulb';
 export class SelectionlistComponent implements OnInit {
     private lightbulbs: Observable<Lightbulb[]>;
     power = 'on';
-    ct = 3000;
+    ct = 3600;
     hue = 100;
-    bright = 40;
+    bright = 60;
     colorMode = 1;
 
     constructor(private lightbulbService: LightbulbService) { }
@@ -58,7 +58,7 @@ export class SelectionlistComponent implements OnInit {
     toggleColorMode(toggleChange: MatSlideToggleChange, selectionList: MatSelectionList) {
         this.power = 'on';
         if (toggleChange.checked) {
-            this.colorMode = 3;
+            this.colorMode = 2;
             selectionList.selectedOptions.selected.forEach(lightbulbOption => {
                 const lightbulb: Lightbulb = lightbulbOption.value;
                 lightbulb.Power = this.power;
@@ -66,7 +66,7 @@ export class SelectionlistComponent implements OnInit {
                 this.lightbulbService.sendHsvUpdate(lightbulb);
             });
         } else {
-            this.colorMode = 2;
+            this.colorMode = 1;
             selectionList.selectedOptions.selected.forEach(lightbulbOption => {
                 const lightbulb: Lightbulb = lightbulbOption.value;
                 lightbulb.Power = this.power;

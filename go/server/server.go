@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"github.com/gorilla/websocket"
+	"sync"
 )
 
 const BROADCAST_INTERVAL = 10 * time.Minute
@@ -93,7 +94,10 @@ func handleWebsocketConnection(w http.ResponseWriter, r *http.Request) {
     websocketclients[ws] = true
 }
 
+var mutex = &sync.Mutex{}
+
 func broadCastToSockets(lightbulb lightbulbs.Lightbulb) {
+	mutex.Lock()
     for client, _ := range websocketclients {
         err := client.WriteJSON(lightbulb)
         if err != nil {
@@ -101,6 +105,7 @@ func broadCastToSockets(lightbulb lightbulbs.Lightbulb) {
         	delete(websocketclients, client)
 		}
     }
+	mutex.Unlock()
 }
 
 func main() {
@@ -116,5 +121,5 @@ func main() {
 	http.HandleFunc("/lightbulb/update/name", handleUpdateNameRequest)
 	http.HandleFunc("/lightbulb/list", handleListRequest)
 	http.HandleFunc("/poweroff", handlePoweroffRequest)
-	http.ListenAndServe(":8080", nil)
+	fmt.Println(http.ListenAndServe(":8080", nil))
 }

@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 	"strconv"
-	"time"
+	"sync"
 )
 
 const BROADCAST_ADDRESS = "239.255.255.250:1982"
@@ -31,7 +31,6 @@ type Lightbulb struct {
 	ColorMode ColorMode
 	Name string
 	IsActive bool
-	LastChangeMillis int64
 }
 
 type HsvRequest struct {
@@ -61,6 +60,7 @@ var addr *net.UDPAddr
 var conn *net.UDPConn
 
 var lightbulbList map[int64]Lightbulb
+var listmutex = &sync.Mutex{}
 
 func init() {
 	tmpAddr, err := net.ResolveUDPAddr("udp", BROADCAST_ADDRESS)
@@ -116,6 +116,7 @@ func parseMessageAndStoreLightbulb(message string) {
 	} else {
 		colorMode = COLOR_MODE
 	}
+	listmutex.Lock()
 	lightbulbList[id] = Lightbulb{
 		Id: id,
 		Location: strings.Replace(rowMap["Location"], "yeelight://", "", 1),
@@ -127,28 +128,36 @@ func parseMessageAndStoreLightbulb(message string) {
 		ColorMode: colorMode,
 		Name: rowMap["name"],
 		IsActive: true,
-		LastChangeMillis: time.Now().Unix(),
 	}
+	listmutex.Unlock()
 }
 
 func GetLightbulbs() []Lightbulb {
 	list := make([]Lightbulb, 0, len(lightbulbList))
+	listmutex.Lock()
 	for _, value := range lightbulbList {
 		list = append(list, value)
 	}
+	listmutex.Unlock()
 	return list
 }
 
 func PowerOffAll() {
 	for _, value := range lightbulbList {
+		listmutex.Lock()
 		value.Power = "off"
+		lightbulbList[value.Id] = value
+		listmutex.Unlock()
 		UpdatePower(PowerRequest{value.Id, "off"})
 	}
 }
 
 func UpdatePower(request PowerRequest) Lightbulb {
+	listmutex.Lock()
 	lightbulb := lightbulbList[request.Id]
 	lightbulb.Power = request.Power
+	lightbulbList[request.Id] = lightbulb
+	listmutex.Unlock()
 	requestString := fmt.Sprintf(
 		"{\"id\": 1, " +
 			"\"method\": \"set_power\", " +
@@ -159,12 +168,15 @@ func UpdatePower(request PowerRequest) Lightbulb {
 }
 
 func UpdateHsv(request HsvRequest) Lightbulb {
+	listmutex.Lock()
 	lightbulb := lightbulbList[request.Id]
 	lightbulb.Power = "on"
 	lightbulb.Hue = request.Hue
 	lightbulb.Sat = request.Sat
 	lightbulb.Bright = request.Bright
 	lightbulb.ColorMode = 2
+	lightbulbList[request.Id] = lightbulb
+	listmutex.Unlock()
 	requestString := fmt.Sprintf(
 		"{\"id\": 1, " +
 			"\"method\": \"set_scene\", " +
@@ -175,11 +187,14 @@ func UpdateHsv(request HsvRequest) Lightbulb {
 }
 
 func UpdateCt(request CtRequest) Lightbulb {
+	listmutex.Lock()
 	lightbulb := lightbulbList[request.Id]
 	lightbulb.Power = "on"
 	lightbulb.ColorMode = 1
 	lightbulb.Ct = request.Ct
 	lightbulb.Bright = request.Bright
+	lightbulbList[request.Id] = lightbulb
+	listmutex.Unlock()
 	requestString := fmt.Sprintf(
 		"{\"id\": 1, " +
 			"\"method\": \"set_scene\", " +
@@ -194,7 +209,9 @@ func UpdateName() {
 }
 
 func sendRequest(id int64, request string) {
+	listmutex.Lock()
 	bulb := lightbulbList[id]
+	listmutex.Unlock()
 	bulbConn, err := net.Dial("tcp", bulb.Location)
 	if err != nil {
 		log.Println(err)
