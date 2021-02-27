@@ -1,7 +1,6 @@
 # Auroreflow
 
-Java backend server and Angular 2 / TypeScript Frontend to 
-control Xiaomi Yeelight lightbulbs on the local network.
+server and Frontend to control Xiaomi Yeelight lightbulbs on the local network.
 
 ### UI
 Currently provides three views 
